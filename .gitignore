@@ -1,0 +1,5 @@
+*.old
+compile_commands.json
+.cache/
+target/
+docs/
