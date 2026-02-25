@@ -3,11 +3,11 @@
 Xradar shell - embedded shell for Xradar
 
 .SH DESCRIPTION
-Xradar shell provides an interactive shell for managing input sources, signal
-processors, and visualizer outputs.
+Xradar shell provides an interactive shell for managing producer sources, signal
+processors, and visualizer consumers.
 
 .SH COMMANDS
-.SS new-(input, middleware, output) [name]
+.SS new-(producer, middleware, consumer) [name]
 Create a new component.
 .TP
 \-t [component-type]
@@ -22,14 +22,14 @@ Component status.
 .SS ls
 List of components.
 .SS add-source [name]
-Add one ore more input to the component.
+Add one ore more producer to the component.
 .TP
-\-i [input-or-middleware-name]
+\-i [producer-or-middleware-name]
 Multiple \-i may be provided.
-.SS start-input [name]
-Signal the input sorce to start.
-.SS stop-input [name]
-Send stop request to input.
+.SS start-producer [name]
+Signal the producer sorce to start.
+.SS stop-producer [name]
+Send stop request to producer.
 
 .SH CONFIG
 Xradar consists of modules which are controlled by directives specified in the
