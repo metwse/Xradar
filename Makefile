@@ -11,7 +11,7 @@ TARGET_DIR = $(DIST_DIR)/$(MODE)
 
 OBJ_DIR = $(TARGET_DIR)/obj
 
-CXXFLAGS_COMMON = -std=gnu++20 -Wall -Wextra -pedantic -fPIC -MMD -MP
+CXXFLAGS_COMMON = -std=gnu++20 -Wall -Wextra -pedantic -lstdc++ -fPIC -MMD -MP
 
 # No need to change rules below this line
 
