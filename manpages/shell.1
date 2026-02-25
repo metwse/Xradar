@@ -1,0 +1,48 @@
+.TH Xradar 1shell
+.SH NAME
+Xradar shell - embedded shell for Xradar
+
+.SH DESCRIPTION
+Xradar shell provides an interactive shell for managing input sources, signal
+processors, and visualizer outputs.
+
+.SH COMMANDS
+.SS new-(input, middleware, output) [name]
+Create a new component.
+.TP
+\-t [component-type]
+Specifies type of component to be created.
+.SS config [name]
+Send component type-specific configuration to component. Grammar for this
+described below.
+.SS rm [name]
+Remove the component.
+.SS stat [name]
+Component status.
+.SS ls
+List of components.
+.SS add-source [name]
+Add one ore more input to the component.
+.TP
+\-i [input-or-middleware-name]
+Multiple \-i may be provided.
+.SS start-input [name]
+Signal the input sorce to start.
+.SS stop-input [name]
+Send stop request to input.
+
+.SH CONFIG
+Xradar consists of modules which are controlled by directives specified in the
+Nginx-like configuration file. A directive consists of name and optional values
+list. Those values can be a floating-point number, integer, string, or table.
+A table is basically brace-surrounded ({ and }) list of directives. Directives
+can be nested using tables. The rest of the line after # is ignored.
+
+.EX
+loopback true;
+\&
+cfar "CA" {
+    bias 1.5;
+    guard_cells 10; # This is a comment
+};
+.EE
