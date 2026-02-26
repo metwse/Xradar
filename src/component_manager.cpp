@@ -10,16 +10,11 @@
 #include <dlfcn.h>
 
 
-ComponentConstructor component_manager::constructor_of(
-    component::kind kind,
-    std::string type
-) {
+component::base_component *component_manager::new_base(component::kind kind,
+                                                       std::string &type) {
     auto &id = type_map[std::make_pair(kind, type)];
     if (id == 0)
         id = ++last_type_id;
-
-    void *dl_handle = NULL;
-    ComponentConstructor constructor = NULL;
 
     if (!constructors.contains(id)) {
         std::filesystem::path file(lib_dir);
@@ -29,32 +24,28 @@ ComponentConstructor component_manager::constructor_of(
         file += type;
         file += ".so";
 
-        dl_handle = dlopen(file.native().c_str(), RTLD_NOW);
+        void *dl_handle = dlopen(file.native().c_str(), RTLD_NOW);
 
         if (!dl_handle)
             throw std::runtime_error("Could not load the shared object!");
-    }
 
-    if (dl_handle) {
-        constructor = ComponentConstructor(dlsym(dl_handle, "constructor"));
+        auto constructor = ComponentConstructor(dlsym(dl_handle, "constructor"));
 
         if (!constructor) {
             dlclose(dl_handle);
 
-            throw std::runtime_error("Could not load the shared object!");
+            throw std::runtime_error("Library does not contain 'constructor' symbol");
         }
 
         libs.insert({
             id,
             std::unique_ptr<void, std::function<int(void *)>>(dl_handle, dlclose)
         });
-    }
 
-    if (constructor) {
         constructors.insert({ id, constructor });
 
-        return constructor;
+        return constructor();
     }
 
-     return constructors.at(id);
+     return constructors.at(id)();
 }

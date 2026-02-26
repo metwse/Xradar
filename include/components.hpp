@@ -15,6 +15,8 @@
 #include <memory>
 #include <string>
 
+class component_manager  /* defined in component_manager.hpp */;
+
 
 namespace component {
 
@@ -42,6 +44,7 @@ enum class kind {
     consumer /** @brief Consumer kind of component. */,
 };
 
+/** @brief Convert component kind enum to string. */
 static inline std::string kind_to_string(enum kind kind) {
     switch (kind) {
     case kind::producer:
@@ -52,7 +55,7 @@ static inline std::string kind_to_string(enum kind kind) {
         return "consumer";
     }
 
-    return "unreachable";  // GCOVR_EXCL_LINE
+    throw "unreachable";  // GCOVR_EXCL_LINE
 }
 
 
@@ -86,22 +89,15 @@ public:
 };
 
 
-/** @brief Input source interface. */
+/**
+ * @brief Input source interface.
+ *
+ * A producer source shall initialize its connections during construction.
+ * Constructor call may be blocking, the event loop handle multhreading for
+ * this.
+ */
 class base_producer : public base_component {
 public:
-    /**
-     * @brief Initialize producer source.
-     *
-     * A producer source shall initialize its connections during construction.
-     * This call may be blocking, the event loop handle multhreading for this.
-     *
-     * @note Constructors can throw exceptions. Such errors will be catched and
-     *       reported to the user.
-     */
-    base_producer(auto state_callback_, auto data_callback_)
-        : state_callback { state_callback_ },
-          data_callback { data_callback_ } {}
-
     /**
      * @brief Start the producer source.
      *
@@ -127,21 +123,25 @@ public:
     enum kind kind() const override
         { return kind::producer; }
 
+protected:
     /** @brief Data source reports its state using this callback. */
     StateCallback state_callback;
 
     /** @brief New data reported using this callback. */
     DataCallback data_callback;
+
+private:
+    friend class ::component_manager;
+
+    void load_callbacks (auto state_callback_, auto data_callback_) {
+        state_callback = state_callback_;
+        data_callback = data_callback_;
+    }
 };
 
 /** @brief Signal processor middleware interface. */
 class base_middleware : public base_component  {
 public:
-    /** @brief Middleware applies backpressure the producer. */
-    base_middleware(auto backpressure_callback_, auto data_callback_)
-        : backpressure_callback { backpressure_callback_ },
-          data_callback { data_callback_ } {}
-
     /**
      * @brief Feed the middleware with input.
      *
@@ -154,11 +154,20 @@ public:
     enum kind kind() const override
         { return kind::middleware; }
 
+protected:
     /** @brief Trigger backpressure on producer to slow it down. */
     BackpressureCallback backpressure_callback;
 
     /** @brief New data reported using this callback. */
     DataCallback data_callback;
+
+private:
+    friend class ::component_manager;
+
+    void load_callbacks (auto backpressure_callback_, auto data_callback_) {
+        backpressure_callback = backpressure_callback_;
+        data_callback = data_callback_;
+    }
 };
 
 /** @brief Processed signal consumer visualizer. */
