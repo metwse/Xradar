@@ -21,7 +21,7 @@ using ConfigValue = std::map<std::string,
                              std::variant<size_t,
                                           double,
                                           std::string,
-                                          std::unique_ptr<config>>>;
+                                          std::shared_ptr<config>>>;
 
 /** @brief Configuration table. */
 class config {

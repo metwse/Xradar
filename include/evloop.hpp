@@ -53,7 +53,7 @@ public:
     void stop_producer(std::string &);
 
 private:
-    /** @brief Numeric ids for names. */
+    /* Numeric ids for component names. */
     std::map<std::string, size_t> name_map;
 
     std::map<size_t, std::vector<size_t>> routing_table;

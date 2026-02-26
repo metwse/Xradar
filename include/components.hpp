@@ -35,6 +35,26 @@ enum class producer_state {
     degraded  /** @brief A fatal error occured and cannot recover the source. */,
 };
 
+/** @brief Component kind. */
+enum class kind {
+    producer  /** @brief Producer kind of component. */,
+    middleware  /** @brief Middleware kind of component. */,
+    consumer /** @brief Consumer kind of component. */,
+};
+
+static inline std::string kind_to_string(enum kind kind) {
+    switch (kind) {
+    case kind::producer:
+        return "producer";
+    case kind::middleware:
+        return "middleware";
+    case kind::consumer:
+        return "consumer";
+    }
+
+    return "unreachable";  // GCOVR_EXCL_LINE
+}
+
 
 /** @brief Callback used in producers when they are reporting their state. */
 using StateCallback = std::function<void(producer_state)>;
@@ -60,6 +80,9 @@ public:
      * @throws component::error if configuration failed.
      */
     virtual void configure(config) = 0;
+
+    /** @brief Component type. */
+    virtual enum kind kind() const = 0;
 };
 
 
@@ -98,7 +121,11 @@ public:
     virtual void stop() = 0;
 
     /** @brief Hint the producer source about the consumer is overwhelmed. */
-    virtual void hint_backpressure(double delay_t) = 0;
+    virtual void hint_backpressure([[maybe_unused]] double delay_t) {};
+
+    /** @returns component::kind::producer */
+    enum kind kind() const override
+        { return kind::producer; }
 
     /** @brief Data source reports its state using this callback. */
     StateCallback state_callback;
@@ -123,6 +150,10 @@ public:
      */
     virtual void feed(std::shared_ptr<std::any>) = 0;
 
+    /** @returns component::kind::middleware */
+    enum kind kind() const override
+        { return kind::middleware; }
+
     /** @brief Trigger backpressure on producer to slow it down. */
     BackpressureCallback backpressure_callback;
 
@@ -135,6 +166,10 @@ class base_consumer : public base_component  {
 public:
     /** @brief Send data to consumer, for visualizer. */
     virtual void send(std::shared_ptr<std::any>) = 0;
+
+    /** @returns component::kind::consumer */
+    enum kind kind() const override
+        { return kind::consumer; }
 };
 
 }
