@@ -8,38 +8,51 @@
 
 
 #include <cstddef>
+#include <istream>
 #include <map>
 #include <memory>
 #include <string>
 #include <variant>
+#include <vector>
 
 
 class config;
 
 /** @brief Table value type. */
-using ConfigValue = std::map<std::string,
-                             std::variant<size_t,
-                                          double,
-                                          std::string,
-                                          std::shared_ptr<config>>>;
+using ConfigValue = std::variant<size_t,
+                                 double,
+                                 std::string,
+                                 std::shared_ptr<config>>;
 
 /** @brief Configuration table. */
 class config {
 public:
+    config() = default;
+
     /** @cond */
-    config(ConfigValue &&data_)
+    config(auto data_)
         : data { data_ } {}
     /** @endcond */
 
     /** @brief Dereference to get underlying data. */
-    ConfigValue &operator*()
+    std::map<std::string, std::vector<ConfigValue>> &operator*()
         { return data; }
 
 private:
     /** @cond */
-    ConfigValue data;
+    std::map<std::string, std::vector<ConfigValue>> data;
     /** @endcond */
 };
 
+/** @brief A class for parsing configuration table from text and reporting
+ * parser status. */
+class parse_config {
+public:
+    /** @brief Parse configuration table from input text stream. */
+    parse_config(std::istream &);
+
+    /** @brief Parsed config. */
+    class config config;
+};
 
 #endif

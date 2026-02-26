@@ -13,7 +13,6 @@
 #include <cstddef>
 #include <map>
 #include <memory>
-#include <string>
 #include <vector>
 
 
@@ -23,38 +22,34 @@ namespace evloop {
 class main {
 public:
     /** @brief Create new producer. */
-    void new_producer(std::string &, std::unique_ptr<component::base_producer>);
+    size_t new_producer(std::unique_ptr<component::base_producer>);
 
     /** @brief Create new middleware. */
-    void new_middleware(std::string &, std::unique_ptr<component::base_middleware>);
+    size_t new_middleware(std::unique_ptr<component::base_middleware>);
 
     /** @brief Create new consumer. */
-    void new_consumer(std::string &, std::unique_ptr<component::base_consumer>);
+    size_t new_consumer(std::unique_ptr<component::base_consumer>);
 
     /** @brief Configure component. */
-    void config(std::string &, config &&);
+    void config(size_t id, config &&);
 
     /** @brief Remove component. */
-    void rm(std::string &);
+    void rm(size_t id);
 
     /** @brief Component status. */
-    void stat(std::string &);
-
-    /** @brief List of components. */
-    std::vector<std::string &> ls();
+    void stat(size_t id);
 
     /** @brief Add source to the component. */
-    void add_source(std::string &, std::vector<std::string>);
+    void add_source(size_t id, std::vector<size_t> input_ids);
 
     /** @brief Start producer. */
-    void start_producer(std::string &);
+    void start_producer(size_t id);
 
     /** @brief Stop producer. */
-    void stop_producer(std::string &);
+    void stop_producer(size_t id);
 
 private:
-    /* Numeric ids for component names. */
-    std::map<std::string, size_t> name_map;
+    size_t last_id {};
 
     std::map<size_t, std::vector<size_t>> routing_table;
     std::map<size_t, std::vector<size_t>> backpressure_table;

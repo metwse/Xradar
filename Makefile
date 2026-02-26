@@ -20,6 +20,8 @@ OBJ_DIR = $(TARGET_DIR)/obj
 CXXFLAGS_COMMON = -std=gnu++20 -Wall -Wextra -pedantic -lstdc++ -fPIC -MMD -MP
 CXXFLAGS_COMPONENT = -shared
 
+EXTERNAL_LIBS = external/lib/librdesc.a
+
 # No need to change rules below this line
 
 CXXFLAGS_release = $(CXXFLAGS_COMMON) -O2
@@ -63,10 +65,10 @@ TEST_COMPONENT_TARGETS = $(patsubst $(TEST_COMPONENT_SRC_DIR)/%.cpp, \
 default: $(EXECUTABLE)
 
 
-$(EXECUTABLE): $(OBJS)
+$(EXECUTABLE): $(OBJS) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-$(TARGET_DIR)/%.test: $(OBJ_DIR)/%.test.o $(LIB_OBJS)
+$(TARGET_DIR)/%.test: $(OBJ_DIR)/%.test.o $(LIB_OBJS) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 $(COMPONENT_TARGET_DIR)/%.so: $(OBJ_DIR)/%.component.o | $(COMPONENT_TARGET_DIR)
@@ -94,6 +96,8 @@ $(OBJ_DIR)/%.test-component.o: $(TEST_COMPONENT_SRC_DIR)/%.cpp | $(OBJ_DIR)
 $(OBJ_DIR) $(COMPONENT_TARGET_DIR) $(TEST_COMPONENT_TARGET_DIR):
 	mkdir -p $@
 
+$(EXTERNAL_LIBS):
+	cd external; make -j
 
 all: default tests components
 
