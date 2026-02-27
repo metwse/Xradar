@@ -14,7 +14,7 @@
 #include <mutex>
 
 
-#define TK_COUNT 9
+#define TK_COUNT 10
 
 #define NT_COUNT 6
 #define NT_VARIANT_COUNT 6
@@ -50,7 +50,8 @@ production_rules[NT_COUNT][NT_VARIANT_COUNT][NT_BODY_LENGTH] = {
 static const char *const tk_names[TK_COUNT] = {
     "\0",
     "@ident", "@float", "@int", "@str", "@bool",
-    "{", "}", ";"
+    "{", "}", ";",
+    "EOF"
 };
 
 static const char *const nt_names[NT_COUNT] = {

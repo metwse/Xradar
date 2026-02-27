@@ -6,12 +6,16 @@
 
 struct rdesc_grammar  /* defined in rdesc/grammar.h */;
 
+
+/* Token definitions. */
 enum config_tk {
     TK_NOTOKEN,
     TK_IDENT, TK_FLOAT, TK_INT, TK_STR, TK_BOOL,
-    TK_LBRACE, TK_RBRACE, TK_SEMI
+    TK_LBRACE, TK_RBRACE, TK_SEMI,
+    TK_EOF,
 };
 
+/* Token definitions. */
 enum config_nt {
     NT_DIRECTIVE, NT_DIRECTIVES,
     NT_PARAMETER,

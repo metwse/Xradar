@@ -17,6 +17,7 @@
 
 
 class config;
+class parse_config;
 
 /** @brief Table value type. */
 using ConfigValue = std::variant<size_t,
@@ -27,22 +28,21 @@ using ConfigValue = std::variant<size_t,
 /** @brief Configuration table. */
 class config {
 public:
-    config() = default;
-
-    /** @cond */
-    config(auto data_)
-        : data { data_ } {}
-    /** @endcond */
-
     /** @brief Dereference to get underlying data. */
     std::map<std::string, std::vector<ConfigValue>> &operator*()
         { return data; }
 
 private:
-    /** @cond */
+    friend class ::parse_config;
+
+    config() = default;
+
+    config(auto data_)
+        : data { data_ } {}
+
     std::map<std::string, std::vector<ConfigValue>> data;
-    /** @endcond */
 };
+
 
 /** @brief A class for parsing configuration table from text and reporting
  * parser status. */
@@ -54,5 +54,6 @@ public:
     /** @brief Parsed config. */
     class config config;
 };
+
 
 #endif

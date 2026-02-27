@@ -78,19 +78,19 @@ $(TEST_COMPONENT_TARGET_DIR)/%.so: $(OBJ_DIR)/%.test-component.o | $(TEST_COMPON
 	$(CXX) $(CXXFLAGS) $(CXXFLAGS_COMPONENT) $^ -o $@
 
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .SECONDARY:
-$(OBJ_DIR)/%.test.o: $(TEST_SRC_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.test.o: $(TEST_SRC_DIR)/%.cpp | $(OBJ_DIR) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .SECONDARY:
-$(OBJ_DIR)/%.component.o: $(COMPONENT_SRC_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.component.o: $(COMPONENT_SRC_DIR)/%.cpp | $(OBJ_DIR) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .SECONDARY:
-$(OBJ_DIR)/%.test-component.o: $(TEST_COMPONENT_SRC_DIR)/%.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.test-component.o: $(TEST_COMPONENT_SRC_DIR)/%.cpp | $(OBJ_DIR) $(EXTERNAL_LIBS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJ_DIR) $(COMPONENT_TARGET_DIR) $(TEST_COMPONENT_TARGET_DIR):
