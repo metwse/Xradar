@@ -1,3 +1,4 @@
+#include "../include/config.hpp"
 #include "config_grammar.hpp"
 #include "config_lex.hpp"
 
@@ -6,8 +7,6 @@
 #include <cstdlib>
 #include <cstring>
 
-
-using namespace config;
 
 void config::seminfo_deleter(uint16_t id, void *seminfo) {
     if (id == TK_IDENT || id == TK_STR)
@@ -21,7 +20,7 @@ static bool is_breaking(char c) {
     return false;
 }
 
-token lex::next() {
+config::token config::lex::next() {
     char c = skip_space();
 
     if (isspace(c) || s.eof())
@@ -42,7 +41,7 @@ token lex::next() {
     return lex_punctuation(c);
 }
 
-token lex::lex_number(char c) {
+config::token config::lex::lex_number(char c) {
     std::string num;
 
     bool has_dot = false;
@@ -74,7 +73,7 @@ token lex::lex_number(char c) {
     }
 }
 
-token lex::lex_string() {
+config::token config::lex::lex_string() {
     std::string str;
 
     char c;
@@ -107,7 +106,7 @@ token lex::lex_string() {
 }
 
 
-token lex::lex_ident_or_bool(char c) {
+config::token config::lex::lex_ident_or_bool(char c) {
     std::string ident;
 
     while ((isalnum(c) || c == '_') && !s.eof()) {
@@ -137,7 +136,7 @@ token lex::lex_ident_or_bool(char c) {
     }
 }
 
-token lex::lex_punctuation(char c) {
+config::token config::lex::lex_punctuation(char c) {
     tk id;
 
     switch (c) {
@@ -157,7 +156,7 @@ token lex::lex_punctuation(char c) {
     return { id, {} };
 }
 
-char lex::skip_space() {
+char config::lex::skip_space() {
     char c;
 
     for (c = ' '; isspace(c) && !s.eof(); c = s.get())
@@ -166,7 +165,7 @@ char lex::skip_space() {
     return c;
 }
 
-token lex::skip_comment() {
+config::token config::lex::skip_comment() {
     char c;
 
     while (!s.eof()) {

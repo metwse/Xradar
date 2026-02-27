@@ -1,3 +1,4 @@
+#include "../include/config.hpp"
 #include "../src/config_grammar.hpp"
 #include "../src/config_lex.hpp"
 

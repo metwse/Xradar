@@ -8,8 +8,47 @@
 
 #include <cctype>
 #include <istream>
+#include <memory>
 #include <new>
+#include <type_traits>
+#include <variant>
 
+
+void config::config::print(std::ostream &os, size_t indent_) const {
+    std::string indent;
+
+    for (size_t i = 0; i < indent_; i++)
+        indent += " ";
+
+    for (auto &it : data) {
+        os << indent << it.first;
+
+        for (auto &parameter : it.second) {
+            std::visit(
+                [&os, &indent, indent_](auto &arg) {
+                    using T = std::decay_t<decltype(arg)>;
+
+                    if constexpr (std::is_same_v<T, std::shared_ptr<config>>) {
+                        os << "{\n";
+                        arg->print(os, indent_ + 4);
+                        os << indent << "}";
+                    } else {
+                        os << " " << arg;
+                    }
+                },
+                parameter
+            );
+        }
+
+        os << ";\n";
+    }
+}
+
+std::ostream &config::operator<<(std::ostream &os, const ::config::config &c) {
+    c.print(os, 0);
+
+    return os;
+}
 
 config::builder::builder() {
     if (rdesc_init(&p, get_grammar(),
@@ -36,9 +75,17 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
             auto parameter = rchild(&p, parameter_ls, 0);
 
             if (rvariant(parameter) == 4  /* block */) {
-                std::shared_ptr<::config::config> block {};
+                auto block = std::make_shared<class config>();
 
-                consume_tree(*block, rchild(&p, n, 1));
+                auto directives = rchild(&p, parameter, 1);
+
+                while (rvariant(directives) == 0) {
+                    auto directive = rchild(&p, directives, 0);
+
+                    consume_tree(*block, directive);
+
+                    directives = rchild(&p, directives, 1);
+                }
 
                 value.push_back(block);
             } else {
@@ -87,6 +134,8 @@ void config::builder::operator<<(std::istream &is) {
         case RDESC_READY:
             consume_tree(config, rdesc_root(&p));
 
+            if (rdesc_reset(&p))
+                    throw std::bad_alloc();  // GCOVR_EXCL_LINE
             rdesc_start(&p, NT_DIRECTIVE);
             break;
 
@@ -95,7 +144,7 @@ void config::builder::operator<<(std::istream &is) {
                     throw std::bad_alloc();  // GCOVR_EXCL_LINE
 
             rdesc_start(&p, NT_DIRECTIVE);
-            break;
+            throw syntax_error("cannot parse input");
 
         case RDESC_CONTINUE:
             break;

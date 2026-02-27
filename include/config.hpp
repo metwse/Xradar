@@ -10,9 +10,11 @@
 #include "../external/include/rdesc/rdesc.h"
 
 #include <cstddef>
+#include <exception>
 #include <istream>
 #include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <variant>
 #include <vector>
@@ -33,14 +35,19 @@ using ConfigValue = std::variant<size_t,
 /** @brief Configuration table. */
 class config {
 public:
-    /** @brief Dereference to get underlying data. */
+    config() = default;
+
+    /** @brief Dereference to get  underlying data. */
     std::map<std::string, std::vector<ConfigValue>> &operator*()
         { return data; }
+
 
 private:
     friend class builder;
 
-    config() = default;
+    friend std::ostream &operator<<(std::ostream &os, const config &);
+
+    void print(std::ostream &os, size_t indent) const;
 
     config(auto data_)
         : data { data_ } {}
@@ -59,7 +66,7 @@ public:
     ~builder()
         { rdesc_destroy(&p); }
 
-    class config &&operator*() &&
+    class config &&operator*()
         { return std::move(config); };
 
     void operator<<(std::istream &is);
@@ -70,6 +77,30 @@ private:
     void consume_tree(class config &, struct rdesc_node *);
 
     class config config;
+};
+
+/** @brief Parsing failed due to a lexer error. */
+class lex_error : std::exception {
+public:
+    lex_error(const char *msg_)
+        : msg { msg_ } {}
+
+    const char *what() const noexcept override { return msg; }  // GCOVR_EXCL_LINE
+
+private:
+    const char *msg;
+};
+
+/** @brief Parsing failed due to a syntax error. */
+class syntax_error : std::exception {
+public:
+    syntax_error(const char *msg_)
+        : msg { msg_ } {}
+
+    const char *what() const noexcept override { return msg; }  // GCOVR_EXCL_LINE
+
+private:
+    const char *msg;
 };
 
 }

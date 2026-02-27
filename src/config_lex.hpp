@@ -6,7 +6,6 @@
 
 #include <cctype>
 #include <cstdint>
-#include <exception>
 #include <istream>
 
 
@@ -24,19 +23,6 @@ struct token {
     tk id;
     ::config::seminfo seminfo;
 };
-
-class lex_error : std::exception {
-public:
-    lex_error(const char *msg_)
-        : msg { msg_ } {}
-
-    const char *what() const noexcept override
-        { return msg; }
-
-private:
-    const char *msg;
-};
-
 
 class lex {
 public:
