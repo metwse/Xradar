@@ -7,7 +7,7 @@ class test_producer : public component::base_producer {
 
     void stop() override {}
 
-    void configure(config) override {}  // GCOVR_EXCL_LINE
+    void configure(config::config) override {}  // GCOVR_EXCL_LINE
 };
 
 

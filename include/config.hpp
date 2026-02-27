@@ -16,8 +16,10 @@
 #include <vector>
 
 
+namespace config {
+
 class config;
-class parse_config;
+class builder;
 
 /** @brief Table value type. */
 using ConfigValue = std::variant<size_t,
@@ -33,7 +35,7 @@ public:
         { return data; }
 
 private:
-    friend class ::parse_config;
+    friend class builder;
 
     config() = default;
 
@@ -46,14 +48,20 @@ private:
 
 /** @brief A class for parsing configuration table from text and reporting
  * parser status. */
-class parse_config {
+class builder {
 public:
     /** @brief Parse configuration table from input text stream. */
-    parse_config(std::istream &);
+    builder(std::istream &);
 
+    class config &&operator*() &&
+        { return std::move(config); };
+
+private:
     /** @brief Parsed config. */
     class config config;
 };
+
+}
 
 
 #endif

@@ -10,11 +10,11 @@
 
 
 
-parse_config::parse_config(std::istream &s) {
+config::builder::builder([[maybe_unused]] std::istream &s) {
     rdesc p;
 
     if (rdesc_init(&p, get_grammar(),
-                   sizeof(seminfo_data),
+                   sizeof(::config::seminfo),
                    seminfo_deleter))
         throw std::bad_alloc();  // GCOVR_EXCL_LINE
 }

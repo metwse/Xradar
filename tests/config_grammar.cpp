@@ -4,5 +4,5 @@
 
 
 int main() {
-    dump_grammar(stdout);
+    config::dump_grammar(stdout);
 }

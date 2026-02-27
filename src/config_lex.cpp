@@ -7,19 +7,21 @@
 #include <cstring>
 
 
-void seminfo_deleter(uint16_t id, void *seminfo) {
+using namespace config;
+
+void config::seminfo_deleter(uint16_t id, void *seminfo) {
     if (id == TK_IDENT || id == TK_STR)
-        delete[] ((seminfo_data *)(seminfo))->string;
+        delete[] ((::config::seminfo *)(seminfo))->string;
 }
 
-bool is_breaking(char c) {
-    if (c == '#' || TK_LBRACE <= c || c <= TK_SEMI)
+static bool is_breaking(char c) {
+    if (c == '#' || c == '{' || c == '}' || c == ';' || isspace(c))
         return true;
 
     return false;
 }
 
-token config_lex::next() {
+token lex::next() {
     char c = skip_space();
 
     if (isspace(c) || s.eof())
@@ -40,7 +42,7 @@ token config_lex::next() {
     return lex_punctuation(c);
 }
 
-token config_lex::lex_number(char c) {
+token lex::lex_number(char c) {
     std::string num;
 
     bool has_dot = false;
@@ -58,7 +60,7 @@ token config_lex::lex_number(char c) {
     }
 
     if ((s.eof() || is_breaking(c)) &&
-        !(num.length() == 1 && (c == '-' || c == '.'))) {
+        !(num.length() == 1 && (num == "-" || num == "."))) {
         if (!s.eof())
             s.unget();
 
@@ -68,13 +70,11 @@ token config_lex::lex_number(char c) {
             return { TK_INT, { .integer = atoll(num.c_str()) } };
         }
     } else {
-        // syntax error, probably number continued with an alphanumeric
-        // character
-        return { TK_NOTOKEN, {} };
+        throw lex_error("invalid number");
     }
 }
 
-token config_lex::lex_string() {
+token lex::lex_string() {
     std::string str;
 
     char c;
@@ -82,9 +82,16 @@ token config_lex::lex_string() {
     while (!s.eof()) {
         c = s.get();
 
-        if (c == '\\' && s.peek() == '"') {
-            s.get();
+        if (c == '\\') {
+            char next = s.peek();
+            if (next == '\\' || next == '"') {
+                str += s.get()  /* next */;
 
+                continue;
+            }
+        }
+
+        if (c == '"') {
             auto c_str = new char[str.length() + 1];
 
             memcpy(c_str, str.c_str(), str.length());
@@ -96,11 +103,11 @@ token config_lex::lex_string() {
         str += c;
     }
 
-    // sytax error due to incomplete string
-    return { TK_NOTOKEN, {} };
+    throw lex_error("unterminated string");
 }
 
-token config_lex::lex_ident_or_bool(char c) {
+
+token lex::lex_ident_or_bool(char c) {
     std::string ident;
 
     while ((isalnum(c) || c == '_') && !s.eof()) {
@@ -126,12 +133,12 @@ token config_lex::lex_ident_or_bool(char c) {
 
         return { TK_IDENT, { .string = c_ident } };
     } else {
-        return { TK_NOTOKEN, {} };
+        throw lex_error("invalid identifier");
     }
 }
 
-token config_lex::lex_punctuation(char c) {
-    auto id = TK_NOTOKEN;
+token lex::lex_punctuation(char c) {
+    tk id;
 
     switch (c) {
     case '{':
@@ -143,12 +150,14 @@ token config_lex::lex_punctuation(char c) {
     case ';':
         id = TK_SEMI;
         break;
+    default:
+        throw lex_error("unknown token");
     }
 
     return { id, {} };
 }
 
-char config_lex::skip_space() {
+char lex::skip_space() {
     char c;
 
     for (c = ' '; isspace(c) && !s.eof(); c = s.get())
@@ -157,16 +166,15 @@ char config_lex::skip_space() {
     return c;
 }
 
-token config_lex::skip_comment() {
+token lex::skip_comment() {
     char c;
 
     while (!s.eof()) {
         c = s.get();
 
         if (c == '\n')
-            return config_lex::next();
+            return lex::next();
     }
 
-    // syntax error, unterminated comment
-    return { TK_NOTOKEN, {} };
+    throw lex_error("unterminated comment");
 }

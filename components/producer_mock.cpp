@@ -8,7 +8,7 @@ class mock_producer : public component::base_producer {
 
     void stop() override {}
 
-    void configure(config) override {}
+    void configure(config::config) override {}
 };
 
 

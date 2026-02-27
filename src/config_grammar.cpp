@@ -21,6 +21,8 @@
 #define NT_BODY_LENGTH 4
 
 
+using namespace config;
+
 static const rdesc_grammar_symbol
 production_rules[NT_COUNT][NT_VARIANT_COUNT][NT_BODY_LENGTH] = {
     /* <directive> ::= */ r(
@@ -71,7 +73,7 @@ static bool global_grammar_initialized = false;
 static std::mutex m_global_grammar;
 
 
-rdesc_grammar *get_grammar() {
+rdesc_grammar *config::get_grammar() {
     std::lock_guard<std::mutex> guard { m_global_grammar };
 
     if (!global_grammar_initialized) {
@@ -85,6 +87,6 @@ rdesc_grammar *get_grammar() {
     return &global_grammar_;
 }
 
-void dump_grammar(FILE *out) {
+void config::dump_grammar(FILE *out) {
     rdesc_dump_bnf(out, get_grammar(), tk_names, nt_names);
 }

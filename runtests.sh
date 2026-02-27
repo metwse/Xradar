@@ -2,7 +2,7 @@
 
 export MODE=debug
 
-make -C tests -j
+make -j all
 
 for test in $(ls ./target/debug/*.test); do
     valgrind $test > $test.log

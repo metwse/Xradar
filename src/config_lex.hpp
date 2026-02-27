@@ -6,26 +6,41 @@
 
 #include <cctype>
 #include <cstdint>
+#include <exception>
 #include <istream>
 
 
-union seminfo_data {
+namespace config {
+
+union seminfo {
     double floating_point  /* TK_FLOAT */;
     int64_t integer  /* TK_INT */;
     bool boolean  /* TK_BOOL */;
-    char *string  /* TK_IDENT TK_STR, null-terminated C string allocated by
-                   * new[] */;
+    const char *string  /* TK_IDENT TK_STR, null-terminated C string allocated
+                         * by new[] */;
 };
 
 struct token {
-    config_tk id;
-    seminfo_data seminfo;
+    tk id;
+    ::config::seminfo seminfo;
+};
+
+class lex_error : std::exception {
+public:
+    lex_error(const char *msg_)
+        : msg { msg_ } {}
+
+    const char *what() const noexcept override
+        { return msg; }
+
+private:
+    const char *msg;
 };
 
 
-class config_lex {
+class lex {
 public:
-    config_lex(std::istream &s_)
+    lex(std::istream &s_)
         : s { s_ } {}
 
     /* Extract the next token. */
@@ -55,6 +70,8 @@ private:
 };
 
 void seminfo_deleter(uint16_t, void *);
+
+}
 
 
 #endif
