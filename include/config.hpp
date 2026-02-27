@@ -7,6 +7,8 @@
 #define CONFIG_HPP
 
 
+#include "../external/include/rdesc/rdesc.h"
+
 #include <cstddef>
 #include <istream>
 #include <map>
@@ -24,6 +26,7 @@ class builder;
 /** @brief Table value type. */
 using ConfigValue = std::variant<size_t,
                                  double,
+                                 bool,
                                  std::string,
                                  std::shared_ptr<config>>;
 
@@ -51,13 +54,21 @@ private:
 class builder {
 public:
     /** @brief Parse configuration table from input text stream. */
-    builder(std::istream &);
+    builder();
+
+    ~builder()
+        { rdesc_destroy(&p); }
 
     class config &&operator*() &&
         { return std::move(config); };
 
+    void operator<<(std::istream &is);
+
 private:
-    /** @brief Parsed config. */
+    rdesc p;
+
+    void consume_tree(class config &, struct rdesc_node *);
+
     class config config;
 };
 

@@ -44,7 +44,7 @@ production_rules[NT_COUNT][NT_VARIANT_COUNT][NT_BODY_LENGTH] = {
         NT(PARAMETER), NT(PARAMETER_LS_REST),
     ),
 
-    /* <parameter_ls_rest> ::= */ ropt(NT(PARAMETER_LS), NT(PARAMETER_LS_REST)),
+    /* <parameter_ls_rest> ::= */ ropt(NT(PARAMETER_LS)),
 
     /* <optparameter_ls> ::= */ ropt(NT(PARAMETER_LS))
 };

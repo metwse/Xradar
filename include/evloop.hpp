@@ -31,7 +31,7 @@ public:
     size_t new_consumer(std::unique_ptr<component::base_consumer>);
 
     /** @brief Configure component. */
-    void config(size_t id, config &&);
+    void config(size_t id, config::config &&);
 
     /** @brief Remove component. */
     void rm(size_t id);

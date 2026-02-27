@@ -101,15 +101,22 @@ int main() {
         "\"\\\" \\\\ \\\\\\\\ \\\\\\\"\\\\\" _0123 true \"\\\\\\\\\" false"
     );
 
-    test_should_fail(std::array { TK_IDENT }, "valid_ident ident-invalid");
+    test_should_fail(std::array { TK_IDENT },
+                     "valid_ident ident-invalid");
 
-    test_should_fail(std::array { TK_INT, TK_FLOAT }, "1 -.5 -");
-    test_should_fail(std::array { TK_INT, TK_FLOAT }, "2 -1. 1-0");
-    test_should_fail(std::array { TK_INT, TK_FLOAT, TK_INT, TK_LBRACE, TK_RBRACE }, "2 -1. 1{} 2a");
+    test_should_fail(std::array { TK_INT, TK_FLOAT },
+                     "1 -.5 -");
+    test_should_fail(std::array { TK_INT, TK_FLOAT },
+                     "2 -1. 1-0");
+    test_should_fail(std::array { TK_INT, TK_FLOAT, TK_INT, TK_LBRACE, TK_RBRACE },
+                     "2 -1. 1{} 2a");
 
-    test_should_fail(std::array { TK_IDENT }, "test # no newline at the end");
+    test_should_fail(std::array { TK_IDENT },
+                     "test # no newline at the end");
 
-    test_should_fail(std::array { TK_STR }, "\"a\"  \"unterminated string");
+    test_should_fail(std::array { TK_STR },
+                     "\"a\"  \"unterminated string");
 
-    test_should_fail(std::array { TK_LBRACE, TK_RBRACE, TK_SEMI }, "{};?");
+    test_should_fail(std::array { TK_LBRACE, TK_RBRACE, TK_SEMI },
+                     "{};?");
 }
