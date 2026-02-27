@@ -44,10 +44,14 @@ void config::config::print(std::ostream &os, size_t indent_) const {
     }
 }
 
-std::ostream &config::operator<<(std::ostream &os, const ::config::config &c) {
+namespace config {
+
+std::ostream &operator<<(std::ostream &os, const config &c) {
     c.print(os, 0);
 
     return os;
+}
+
 }
 
 config::builder::builder() {
