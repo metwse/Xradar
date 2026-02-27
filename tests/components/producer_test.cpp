@@ -2,6 +2,7 @@
 #include "../../include/config.hpp"
 
 
+/** @cond */
 class test_producer : public component::base_producer {
     void start() override {}
 
@@ -9,6 +10,7 @@ class test_producer : public component::base_producer {
 
     void configure(config::config) override {}  // GCOVR_EXCL_LINE
 };
+/** @endcond */
 
 
 extern "C" test_producer *constructor() {

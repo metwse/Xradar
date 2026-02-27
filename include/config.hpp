@@ -66,9 +66,11 @@ public:
     ~builder()
         { rdesc_destroy(&p); }
 
+    /** @brief Consume the matched config. */
     class config &&operator*()
         { return std::move(config); };
 
+    /** @brief Feed the parser with new input. */
     void operator<<(std::istream &is);
 
 private:
@@ -82,10 +84,12 @@ private:
 /** @brief Parsing failed due to a lexer error. */
 class lex_error : std::exception {
 public:
+    /** @cond */
     lex_error(const char *msg_)
         : msg { msg_ } {}
 
     const char *what() const noexcept override { return msg; }  // GCOVR_EXCL_LINE
+    /** @endcond */
 
 private:
     const char *msg;
@@ -94,10 +98,12 @@ private:
 /** @brief Parsing failed due to a syntax error. */
 class syntax_error : std::exception {
 public:
+    /** @cond */
     syntax_error(const char *msg_)
         : msg { msg_ } {}
 
     const char *what() const noexcept override { return msg; }  // GCOVR_EXCL_LINE
+    /** @endcond */
 
 private:
     const char *msg;

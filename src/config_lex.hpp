@@ -11,25 +11,29 @@
 
 namespace config {
 
+/** @brief Additional semantic information for a token. */
 union seminfo {
-    double floating_point  /* TK_FLOAT */;
-    int64_t integer  /* TK_INT */;
-    bool boolean  /* TK_BOOL */;
-    const char *string  /* TK_IDENT TK_STR, null-terminated C string allocated
-                         * by new[] */;
+    double floating_point  /** @brief TK_FLOAT */;
+    int64_t integer  /** @brief TK_INT */;
+    bool boolean  /** @brief TK_BOOL */;
+    const char *string  /** @brief TK_IDENT TK_STR, null-terminated C string
+                         * allocated by new[] */;
 };
 
+/** @brief Token (id + seminfo). */
 struct token {
-    tk id;
-    ::config::seminfo seminfo;
+    tk id  /** @brief Token identifier. */;
+    ::config::seminfo seminfo /** @brief Token seminfo. */;
 };
 
+/** @brief Lexer for configuration grammar. */
 class lex {
 public:
+    /** @brief Construct lexer from input stream. */
     lex(std::istream &s_)
         : s { s_ } {}
 
-    /* Extract the next token. */
+    /** @brief Extract the next token. */
     token next();
 
 private:
