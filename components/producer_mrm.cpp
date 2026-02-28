@@ -2,8 +2,8 @@
 #include "../include/config.hpp"
 
 
-/** @brief Mock signal source. */
-class mock_producer : public component::base_producer {
+/** @brief MRM signal source. */
+class mrm_producer : public component::base_producer {
     void start() override {}
 
     void stop() override {}
@@ -12,6 +12,6 @@ class mock_producer : public component::base_producer {
 };
 
 
-extern "C" mock_producer *constructor() {
-    return new mock_producer;
+extern "C" mrm_producer *constructor() {
+    return new mrm_producer;
 };

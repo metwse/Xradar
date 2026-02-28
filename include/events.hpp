@@ -2,9 +2,11 @@
 #define EVENTS_HPP
 
 #include "components.hpp"
+#include "config.hpp"
 #include "evloop.hpp"
 
 #include <cstddef>
+#include <utility>
 #include <vector>
 #include <memory>
 
@@ -19,36 +21,59 @@ public:
 };
 
 
-/** @brief Add a new producer. */
-class new_producer : public base_event {
+/** @brief Add a new component. */
+class new_component : public base_event {
 public:
+    /** @cond */
+    new_component(component::kind kind_, std::string type_)
+        : kind { kind_ }, type { type_ } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
-    /** @brief Producer to be added to evloop. */
-    std::unique_ptr<component::base_producer> producer;
+    /** @cond Kind of the new component. */
+    component::kind kind;
+
+    /** @cond Type of the new component. */
+    std::string type;
 };
 
-/** @brief Add a new middleware. */
-class new_middleware : public base_event {
+/** @brief Configure the component. */
+class configure : public base_event {
 public:
+    /** @cond */
+    configure(auto config_)
+        : config { std::move(config_) } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
-    /** @brief Middleware to be added to evloop. */
-    std::unique_ptr<component::base_middleware> middleware;
+    /** @brief Configuration to be sent. */
+    config::config config;
 };
 
-/** @brief Add a new consumer. */
-class new_consumer : public base_event {
+/** @brief Remove component. */
+class rm : public base_event {
 public:
+    /** @cond */
+    rm(auto id_)
+        : id { id_ } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
-    /** @brief Consumer to be added to evloop. */
-    std::unique_ptr<component::base_consumer> consumer;
+    /** @brief Component to be removed. */
+    size_t id;
 };
 
 /** @brief Add sources to a component. */
 class add_source : public base_event {
 public:
+    /** @cond */
+    add_source(auto id_, auto source_ids_)
+        : id { id_ }, source_ids { std::move(source_ids_) } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
     /** @brief Middleware/consumer which receive input. */
@@ -61,6 +86,11 @@ public:
 /** @brief Start the producer. */
 class start_producer : public base_event {
 public:
+    /** @cond */
+    start_producer(auto id_)
+        : id { id_ } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
     /** @brief Ids of the producer to be started. */
@@ -70,6 +100,11 @@ public:
 /** @brief Stop the producer. */
 class stop_producer : public base_event {
 public:
+    /** @cond */
+    stop_producer(auto id_)
+        : id { id_ } {}
+    /** @endcond */
+
     void operator()(std::shared_ptr<evloop::evloop>) override;
 
     /** @brief Ids of the producer to be stopped. */

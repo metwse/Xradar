@@ -3,11 +3,15 @@
 
 #include <memory>
 #include <mutex>
+#include <thread>
 
 
 void evloop::evloop::shutdown() {
     {
         std::lock_guard guard { event_queue_m };
+
+        if (!running)
+            return;
 
         running = false;
     }

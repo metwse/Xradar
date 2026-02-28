@@ -18,7 +18,7 @@ TEST_COMPONENT_TARGET_DIR = $(TARGET_DIR)/test-components
 OBJ_DIR = $(TARGET_DIR)/obj
 
 CXXFLAGS_COMMON = -std=gnu++20 -Wall -Wextra -pedantic -lstdc++ -fPIC -MMD -MP
-CXXFLAGS_COMPONENT = -shared
+CXXFLAGS_COMPONENT = -shared $(pkg-config --cflags --libs x11)
 
 EXTERNAL_LIBS = external/lib/librdesc.a
 

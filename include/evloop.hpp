@@ -13,7 +13,9 @@
 #include <mutex>
 #include <thread>
 
-namespace events { class base_event; };
+namespace events { class base_event; }  /* defined in events.hpp */
+
+class state;  /* internal: defined in state.hpp */
 
 
 namespace evloop {
@@ -26,6 +28,9 @@ private:
 public:
     /** @cond */
     evloop(token) {}
+
+    ~evloop()
+        { shutdown(); }
     /** @endcond */
 
     /** @brief Create the event loop. */
@@ -48,11 +53,18 @@ public:
     /** @brief Add event to the loop. */
     void push_event(std::unique_ptr<events::base_event>);
 
+    /** @brief Underlying application state. */
+    std::shared_ptr<::state> state;
+
+    /** @brief Mutual exclusion of application state. */
+    std::mutex state_m;
+
 private:
     static void run(std::shared_ptr<evloop>);
 
     bool running { true };
 
+    /* Reports the event loop thread is running. */
     std::condition_variable thread_ready_cv;
     std::mutex thread_ready_m;
     bool thread_ready { false };

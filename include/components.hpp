@@ -93,8 +93,6 @@ public:
  * @brief Input source interface.
  *
  * A producer source shall initialize its connections during construction.
- * Constructor call may be blocking, the event loop handle multhreading for
- * this.
  */
 class base_producer : public base_component {
 public:

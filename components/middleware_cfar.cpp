@@ -4,14 +4,14 @@
 #include <memory>
 
 
-/** @brief Built-in mock middleware. */
-class mock_middleware : public component::base_middleware {
+/** @brief Built-in CFAR middleware. */
+class cfar_middleware : public component::base_middleware {
     void feed(std::shared_ptr<std::any>) override {};
 
     void configure(config::config) override {}
 };
 
 
-extern "C" mock_middleware *constructor() {
-    return new mock_middleware;
+extern "C" cfar_middleware *constructor() {
+    return new cfar_middleware;
 };
