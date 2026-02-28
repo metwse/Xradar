@@ -1,4 +1,4 @@
-#include "../include/component_manager.hpp"
+#include "../include/component_loader.hpp"
 #include "../include/components.hpp"
 
 #include <cassert>
@@ -13,7 +13,7 @@ int main([[maybe_unused]] int argc, const char **argv) {
     lib_dir = lib_dir.parent_path();
     lib_dir /= "test-components";
 
-    component_manager cm { lib_dir };
+    component_loader cm { lib_dir };
 
     auto producer = cm.new_producer("test",
                                     [](component::producer_state) {},  // GCOVR_EXCL_LINE

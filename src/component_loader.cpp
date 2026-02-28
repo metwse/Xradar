@@ -1,4 +1,4 @@
-#include "../include/component_manager.hpp"
+#include "../include/component_loader.hpp"
 #include "../include/components.hpp"
 
 #include <filesystem>
@@ -10,7 +10,7 @@
 #include <dlfcn.h>
 
 
-component::base_component *component_manager::new_base(component::kind kind,
+component::base_component *component_loader::new_base(component::kind kind,
                                                        std::string &type) {
     auto &id = type_map[std::make_pair(kind, type)];
     if (id == 0)

@@ -1,10 +1,10 @@
 /**
- * @file component_manager.hpp
+ * @file component_loader.hpp
  * @brief Dynamicly load components.
  */
 
-#ifndef COMPONENT_MANAGER_HPP
-#define COMPONENT_MANAGER_HPP
+#ifndef COMPONENT_LOADER_HPP
+#define COMPONENT_LOADER_HPP
 
 
 #include "components.hpp"
@@ -19,13 +19,13 @@
 
 
 /** @brief Manages dynamically loaded component constructors. */
-class component_manager {
+class component_loader {
 public:
-    /** @brief Component manager loads components from the system. */
-    component_manager() = default;
+    /** @brief Loads components from the system. */
+    component_loader() = default;
 
-    /** @brief Component manager loads components given path. */
-    component_manager(auto lib_dir_)
+    /** @brief Loads components from given path. */
+    component_loader(auto lib_dir_)
         : lib_dir { lib_dir_ } {}
 
     /** @brief Create a new producer component. */

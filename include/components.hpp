@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 
-class component_manager  /* defined in component_manager.hpp */;
+class component_loader  /* defined in component_loader.hpp */;
 
 namespace config { class config; }  /* defined in config.hpp */;
 
@@ -131,7 +131,7 @@ protected:
     DataCallback data_callback;
 
 private:
-    friend class ::component_manager;
+    friend class ::component_loader;
 
     void load_callbacks (auto state_callback_, auto data_callback_) {
         state_callback = state_callback_;
@@ -162,7 +162,7 @@ protected:
     DataCallback data_callback;
 
 private:
-    friend class ::component_manager;
+    friend class ::component_loader;
 
     void load_callbacks (auto backpressure_callback_, auto data_callback_) {
         backpressure_callback = backpressure_callback_;
