@@ -33,7 +33,10 @@ int main()  {
         evloop->push_event(std::make_unique<test_event>(),
                            std::make_unique<test_event>());
 
-    evloop->shutdown();
+    evloop->shutdown();  /* shutdown joins all threads and waits until the
+                          * event queue completed */
+
+    evloop->shutdown();  /* second call to shutdown is ignored */
 
     assert(event_run == 40);
 }

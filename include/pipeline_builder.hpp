@@ -1,24 +1,19 @@
-#ifndef PIPELINE_HPP
-#define PIPELINE_HPP
+#ifndef PIPELINE_BUILDER_HPP
+#define PIPELINE_BUILDER_HPP
 
 
 #include <cstddef>
 #include <map>
 #include <string>
+#include <string_view>
+#include <string>
 #include <vector>
 
 class component_manager  /* defined in component_manager.hpp */;
+namespace pipeline { class pipeline; }  /* defined in pipeline.hpp */;
 
 
 namespace pipeline {
-
-class builder;
-
-/** @brief The signal processing pipeline. */
-class pipeline {
-private:
-    friend class builder;
-};
 
 /** @brief Builder for singal processing pipeline. */
 class builder {
@@ -30,13 +25,13 @@ public:
      *
      * @note Every pipeline must have only one producer.
      */
-    builder &set_producer(std::string_view name, std::string_view kind);
+    builder &set_producer(std::string_view name, std::string_view type);
 
     /** @brief Add a new middleware to the pipeline. */
-    builder &add_middleware(std::string_view name, std::string_view kind);
+    builder &add_middleware(std::string_view name, std::string_view type);
 
     /** @brief Output consumer. */
-    builder &add_consumer(std::string_view name, std::string_view kind);
+    builder &add_consumer(std::string_view name, std::string_view type);
 
     /** @brief Add a source to a consumer or middleware. */
     builder &connect(std::string_view name, std::string_view source_name);
@@ -47,9 +42,12 @@ public:
 private:
     /* component name/type strint to integer mapping */
     std::map<std::string, size_t> name_map;
-    std::map<size_t, std::string> name_map_rev;
+    std::vector<std::string> name_map_rev;
 
     size_t last_name_id {};
+
+    size_t get_name_id(std::string_view);
+    const std::string &ident_name(size_t i) const;
 
     size_t producer_name {};
     size_t producer_type {};
@@ -58,11 +56,22 @@ private:
     std::map<size_t, size_t> middleware;
     std::map<size_t, size_t> consumers;
 
-    /* producer id -> list of middleware that apply backpressure to producer */
-    std::map<size_t, std::vector<size_t>> backpressure_table;
-
     /* component id -> list of connected components to this source */
     std::map<size_t, std::vector<size_t>> routing_table;
+};
+
+/** @brief Pipeline build error. */
+class build_error : std::exception {
+public:
+    /** @cond */
+    build_error(const char *msg_)
+        : msg { msg_ } {}
+
+    const char *what() const noexcept override { return msg; }  // GCOVR_EXCL_LINE
+    /** @endcond */
+
+private:
+    const char *msg;
 };
 
 }
