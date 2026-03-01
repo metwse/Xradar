@@ -1,7 +1,11 @@
 # Xradar
-a *runtime* for signal processing and radar control.
+Xradar is a C++20 radar signal processing framework built around a
+plugin-based, event-driven pipeline.
 
 ## Architecture
+The design separates concerns into four layers: pipeline configuration, event
+dispatch, signal processing, and on-fly reconfiguration.
+
 Xradar employs a custom event loop, optimized for parallel computing. The
 event loop synchronizes processing pipeline, providing parallel computing for
 processing branches.
@@ -32,7 +36,41 @@ source ----> middleware1 ----> middleware2 ----> visualizer
                            --> middleware3 ---
 ```
 
-Here, the source triggers signal propagation. First, `middleware1` runs; then,
+Here, the `source` triggers signal propagation. First, `middleware1` runs; then,
 `middleware2` and `middleware3` run *in parallel*. Finally, the `visualizer` is
 fed the results from `middleware2` and `middleware3` in the order of their
 construction.
+
+Xradar shell introduces a fluent DSL for wiring components:
+```sh
+begin-pipeline processing_pipeline1
+
+set-producer source -t mrm_radar  # Input triggers pipeline
+
+add-middleware middleware1 -t cfar  # Chain processor middleware
+add-middleware middleware2 -t ...
+add-middleware middleware3 -t ...
+
+add-consumer visualizer -t x11  # One or more consumer may be added
+# i.e. for recording one may add another consumer
+
+# Connection network
+connect source -i middleware1
+
+connect middleware2 -i middleware1
+connect middleware3 -i middleware2
+
+connect visualizer -i middleware2 -i middleware3
+
+build-pipeline
+
+# ...
+
+# Run the pipeline
+start-pipeline processing_pipeline1
+```
+
+### Serializability
+Middleware can be mark as non-serializable using `parallelizable()` scheduling
+hint. When `true`, the evloop can dispatch concurrent calls to this middleware
+without ordering guarantees. When `false`, the pipeline must serialize calls
