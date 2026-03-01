@@ -7,6 +7,7 @@
 #include "../external/include/rdesc/util.h"
 
 #include <cctype>
+#include <cstring>
 #include <istream>
 #include <memory>
 #include <new>
@@ -67,7 +68,11 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
     if (rvariant(n) == 1)
         return;
 
-    std::string key { *(char **) rseminfo(rchild(&p, n, 0)) };
+
+    char *key_ = NULL;
+    memcpy(&key_, rseminfo(rchild(&p, n, 0)), sizeof(char *));
+
+    std::string key { key_ };
     std::vector<ConfigValue> &value = c.data[key];
 
     auto optparameter_ls = rchild(&p, n, 1);
@@ -95,25 +100,24 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
             } else {
                 void *any_seminfo = rseminfo(rchild(&p, parameter, 0));
 
+                ConfigValue item;
+
                 switch (rvariant(parameter)) {
-                case 0: {  /* int */
-                    size_t seminfo = *(size_t *) any_seminfo;
-                    value.push_back(std::forward<size_t>(seminfo));
+                case 0:  /* int */
+                    item = *static_cast<size_t *>(any_seminfo);
                     break;
-                } case 1: {  /* float */
-                    double seminfo = *(double *) any_seminfo;
-                    value.push_back(std::forward<double>(seminfo));
+                case 1:  /* float */
+                    item = *static_cast<double *>(any_seminfo);
                     break;
-                } case 2: {  /* str */
-                    char *seminfo = *(char **) any_seminfo;
-                    value.push_back(std::forward<std::string>(seminfo));
+                case 2:  /* str */
+                    item = *static_cast<char **>(any_seminfo);
                     break;
-                } case 3: {  /* bool */
-                    bool seminfo = *(bool *) any_seminfo;
-                    value.push_back(std::forward<bool>(seminfo));
+                case 3:  /* bool */
+                    item = *static_cast<bool *>(any_seminfo);
                     break;
                 }
-                }
+
+                value.push_back(std::move(item));
             }
 
             auto parameter_ls_rest = rchild(&p, parameter_ls, 1);

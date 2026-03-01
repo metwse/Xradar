@@ -141,12 +141,20 @@ private:
 class base_middleware : public base_component  {
 public:
     /**
-     * @brief Feed the middleware with input.
+     * @brief Feed the middleware with input and receive output.
      *
-     * This function blocks until the data accepted. Backpressure may be
-     * triggered if this infilates the event loop queue.
+     * This can be blocking as the event loop handles parallelization.
      */
-    virtual void feed(std::shared_ptr<std::any>) = 0;
+    virtual std::shared_ptr<std::any> process(std::shared_ptr<std::any>) = 0;
+
+    /**
+     * @brief Wheter or not the concurrent calls to the middleware is safe.
+     *
+     * If underlying algorithm depends on previous state and shall receive
+     * inputs in order they are produced, then this function return true.
+     * Execution plan ensures that the middleware is called in correct order.
+     */
+    virtual bool parallelizable() const = 0;
 
     /** @returns component::kind::middleware */
     enum kind kind() const override
@@ -156,15 +164,11 @@ protected:
     /** @brief Trigger backpressure on producer to slow it down. */
     BackpressureCallback backpressure_callback;
 
-    /** @brief New data reported using this callback. */
-    DataCallback data_callback;
-
 private:
     friend class ::component_loader;
 
-    void load_callbacks (auto backpressure_callback_, auto data_callback_) {
+    void load_callbacks (auto backpressure_callback_) {
         backpressure_callback = backpressure_callback_;
-        data_callback = data_callback_;
     }
 };
 

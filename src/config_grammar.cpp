@@ -74,7 +74,7 @@ static std::mutex m_global_grammar;
 
 
 rdesc_grammar *config::get_grammar() {
-    std::lock_guard<std::mutex> guard { m_global_grammar };
+    std::lock_guard guard { m_global_grammar };
 
     if (!global_grammar_initialized) {
         rdesc_grammar_init(&global_grammar_,

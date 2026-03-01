@@ -1,30 +1,39 @@
 #include "../include/evloop.hpp"
-#include "../include/events.hpp"
 
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <unistd.h>
 
 
-static bool event_run = false;
+static std::mutex event_run_m;
+static int event_run = 0;
 
 /** @brief Dummy event stting event_run variable true. */
-class test_event : public events::base_event {
+class test_event : public evloop::base_event {
     void operator()([[maybe_unused]] std::shared_ptr<evloop::evloop> e) override {
-        event_run = true;
+        std::lock_guard g { event_run_m };
+
+        event_run++;
     }
 };
 
 
 int main()  {
     auto evloop = evloop::evloop::create();
-    auto evloop2 = evloop::evloop::create();
 
-    evloop->push_event(std::make_unique<test_event>());
+    for (int i = 0; i < 10; i++)
+        evloop->push_event(std::make_unique<test_event>(),
+                           std::make_unique<test_event>());
 
-    while (!event_run)
+    while (event_run != 20)
         ;
 
+    for (int i = 0; i < 10; i++)
+        evloop->push_event(std::make_unique<test_event>(),
+                           std::make_unique<test_event>());
+
     evloop->shutdown();
-    /* evloop2 destroyed by its destructor */
+
+    assert(event_run == 40);
 }

@@ -6,7 +6,11 @@
 
 /** @brief Built-in CFAR middleware. */
 class cfar_middleware : public component::base_middleware {
-    void feed(std::shared_ptr<std::any>) override {};
+    std::shared_ptr<std::any> process(std::shared_ptr<std::any>) override
+        { throw "todo"; }
+
+    bool parallelizable() const override
+        { return true; }
 
     void configure(config::config) override {}
 };

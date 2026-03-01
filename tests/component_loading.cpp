@@ -24,10 +24,10 @@ int main([[maybe_unused]] int argc, const char **argv) {
     producer->hint_backpressure(0);
 
     auto middleware = cm.new_middleware("test",
-                                        [](double) {},  // GCOVR_EXCL_LINE
-                                        [](std::unique_ptr<std::any>) {});
+                                        [](double) {});
     assert(middleware->kind() == component::kind::middleware);
-    middleware->feed(std::make_shared<std::any>(0));
+    middleware->process(std::make_shared<std::any>(0));
+    middleware->parallelizable();
 
     auto consumer = cm.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);

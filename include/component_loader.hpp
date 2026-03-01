@@ -46,14 +46,13 @@ public:
     /** @brief Create a new middleware component. */
     std::unique_ptr<component::base_middleware> new_middleware(
         std::string type,
-        component::BackpressureCallback backpressure_callback,
-        component::DataCallback data_callback
+        component::BackpressureCallback backpressure_callback
     ) {
         auto middleware = dynamic_cast<component::base_middleware *>(
             new_base(component::kind::middleware, type)
         );
 
-        middleware->load_callbacks(backpressure_callback, data_callback);
+        middleware->load_callbacks(backpressure_callback);
 
         return std::unique_ptr<component::base_middleware>(middleware);
     }

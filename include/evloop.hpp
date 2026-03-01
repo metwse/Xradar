@@ -8,17 +8,19 @@
 
 
 #include <condition_variable>
+#include <cstddef>
 #include <deque>
 #include <memory>
 #include <mutex>
 #include <thread>
-
-namespace events { class base_event; }  /* defined in events.hpp */
+#include <vector>
 
 class state;  /* internal: defined in state.hpp */
 
 
 namespace evloop {
+
+class base_event;
 
 /** @brief Event loop frontend. */
 class evloop : std::enable_shared_from_this<evloop> {
@@ -28,52 +30,63 @@ private:
 public:
     /** @cond */
     evloop(token) {}
-
-    ~evloop()
-        { shutdown(); }
     /** @endcond */
 
     /** @brief Create the event loop. */
-    static std::shared_ptr<evloop> create() {
-        auto shared_this = std::make_shared<evloop>(token {});
+    static std::shared_ptr<evloop> create();
 
-        shared_this->thread = std::jthread { run, shared_this };
-
-        std::unique_lock lk { shared_this->thread_ready_m };
-        shared_this->thread_ready_cv.wait(lk, [&shared_this] (){
-            return shared_this->thread_ready;
-        });
-
-        return shared_this;
-    }
-
-    /** @brief Request the event loop to shutdown. */
+    /**
+     * @brief Request the event loop to shutdown.
+     *
+     * This method should explicitly be called to destroy evloop as the workers
+     * holds a reference to `this`.
+     */
     void shutdown();
 
-    /** @brief Add event to the loop. */
-    void push_event(std::unique_ptr<events::base_event>);
+    /**
+     * @brief Adds event(s) to the event loop.
+     *
+     * Events provided in a single call are guaranteed to be executed
+     * sequentially in the order they are passed. However, the relative order
+     * of events between separate calls to this function is not guaranteed.
+     */
+    template<typename... Args>
+    void push_event(Args &&...args) {
+        {
+            std::lock_guard guard { event_queue_m };
+
+            (event_queue.push_back(std::forward<Args>(args)), ...);
+        }
+
+        event_queue_cv.notify_one();
+    }
+
 
     /** @brief Underlying application state. */
     std::shared_ptr<::state> state;
 
-    /** @brief Mutual exclusion of application state. */
-    std::mutex state_m;
-
 private:
-    static void run(std::shared_ptr<evloop>);
+    static void run(std::shared_ptr<evloop>, size_t);
 
     bool running { true };
 
     /* Reports the event loop thread is running. */
     std::condition_variable thread_ready_cv;
     std::mutex thread_ready_m;
-    bool thread_ready { false };
+    size_t thread_ready { 0 };
 
     std::condition_variable event_queue_cv;
     std::mutex event_queue_m;
-    std::deque<std::unique_ptr<events::base_event>> event_queue;
+    std::deque<std::unique_ptr<base_event>> event_queue;
 
-    std::jthread thread;
+    std::vector<std::thread> threads;
+};
+
+/** @brief Scheduled event. */
+class base_event {
+public:
+    /** @brief Operation. */
+    virtual void operator()(std::shared_ptr<evloop>) = 0;
 };
 
 }
