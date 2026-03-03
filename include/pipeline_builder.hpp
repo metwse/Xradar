@@ -4,12 +4,13 @@
 
 #include <cstddef>
 #include <map>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <string>
 #include <vector>
 
-class component_manager  /* defined in component_manager.hpp */;
+class component_loader  /* defined in component_loader.hpp */;
 namespace pipeline { class pipeline; }  /* defined in pipeline.hpp */;
 
 
@@ -37,7 +38,7 @@ public:
     builder &connect(std::string_view name, std::string_view source_name);
 
     /** @brief Build the pipeline. */
-    pipeline build(component_manager &);
+    std::shared_ptr<pipeline> build(component_loader &);
 
 private:
     /* component name/type strint to integer mapping */
@@ -47,10 +48,11 @@ private:
     size_t last_name_id {};
 
     size_t get_name_id(std::string_view);
-    const std::string &ident_name(size_t i) const;
+    const std::string &get_name(size_t i) const
+        { return name_map_rev[i - 1]; }
 
-    size_t producer_name {};
-    size_t producer_type {};
+    size_t producer_name_id {};
+    size_t producer_type_id {};
 
     /* component id, type id */
     std::map<size_t, size_t> middleware;

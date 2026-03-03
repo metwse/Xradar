@@ -23,8 +23,13 @@ namespace pipeline { class builder; }  /* defined in pipeline.hpp */
 namespace pipeline {
 
 /** @brief The signal processing pipeline. */
-class pipeline {
+class pipeline : public std::enable_shared_from_this<pipeline> {
+private:
+    struct token { explicit token() = default; };
+
 public:
+    pipeline(token) {}
+
     /** @brief Start the processing pipeline. */
     void start();
 
@@ -35,7 +40,10 @@ public:
     void config(config::config);
 
 private:
-    friend class buider;
+    friend class builder;
+
+    static std::shared_ptr<pipeline> create()
+        { return std::make_shared<pipeline>(token {}); }
 
     std::vector<std::string> name_map_rev;
 

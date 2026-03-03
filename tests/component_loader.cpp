@@ -1,21 +1,16 @@
 #include "../include/component_loader.hpp"
 #include "../include/components.hpp"
+#include "testutil.hpp"
 
 #include <cassert>
-#include <filesystem>
 #include <memory>
 #include <stdexcept>
 
 
-int main([[maybe_unused]] int argc, const char **argv) {
-    std::filesystem::path lib_dir { argv[0] };
+int main(int, const char **argv) {
+    TEST_COMPONENT_LOADER;
 
-    lib_dir = lib_dir.parent_path();
-    lib_dir /= "test-components";
-
-    component_loader cm { lib_dir };
-
-    auto producer = cm.new_producer("test",
+    auto producer = cl.new_producer("test",
                                     [](component::producer_state) {},  // GCOVR_EXCL_LINE
                                     [](std::unique_ptr<std::any>) {});
     assert(producer->kind() == component::kind::producer);
@@ -23,24 +18,24 @@ int main([[maybe_unused]] int argc, const char **argv) {
     producer->stop();
     producer->hint_backpressure(0);
 
-    auto middleware = cm.new_middleware("test",
+    auto middleware = cl.new_middleware("test",
                                         [](double) {});
     assert(middleware->kind() == component::kind::middleware);
     middleware->process(std::make_shared<std::any>(0));
     middleware->parallelizable();
 
-    auto consumer = cm.new_consumer("test");
+    auto consumer = cl.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);
     consumer->send(std::make_shared<std::any>(0));
 
     /* destruct previous consumer and allocate new one */
-    consumer = cm.new_consumer("test");
+    consumer = cl.new_consumer("test");
 
     try {
-        assert((cm.new_consumer("clearly-nonexistent-module"), "should throw"));
+        assert((cl.new_consumer("clearly-nonexistent-module"), "should throw"));
     } catch (std::runtime_error &) {}
 
     try {
-        assert((cm.new_consumer("no-constructor"), "should throw"));
+        assert((cl.new_consumer("no-constructor"), "should throw"));
     } catch (std::runtime_error &) {}
 }

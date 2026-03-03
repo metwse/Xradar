@@ -1,8 +1,11 @@
+#include "../include/component_loader.hpp"
 #include "../include/pipeline_builder.hpp"
+#include "testutil.hpp"
+
 #include <cassert>
 
 
-int main() {
+int main(int, char *argv[]) {
     pipeline::builder builder;
 
     builder
@@ -42,4 +45,8 @@ int main() {
     }
 
     assert(failed == 3);
+
+    TEST_COMPONENT_LOADER;
+
+    builder.build(cl);
 }

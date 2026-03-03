@@ -1,4 +1,5 @@
 #include "../include/config.hpp"
+#include "../include/components.hpp"
 #include "../include/pipeline.hpp"
 
 
