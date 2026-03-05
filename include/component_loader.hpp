@@ -40,7 +40,7 @@ public:
 
         producer->load_callbacks(state_callback, data_callback);
 
-        return std::unique_ptr<component::base_producer>(producer);
+        return std::unique_ptr<component::base_producer> { producer };
     }
 
     /** @brief Create a new middleware component. */
@@ -54,7 +54,7 @@ public:
 
         middleware->load_callbacks(backpressure_callback);
 
-        return std::unique_ptr<component::base_middleware>(middleware);
+        return std::unique_ptr<component::base_middleware> { middleware };
     }
 
     /** @brief Create a new consumer component. */
@@ -63,7 +63,7 @@ public:
             new_base(component::kind::consumer, type)
         );
 
-        return std::unique_ptr<component::base_consumer>(consumer);
+        return std::unique_ptr<component::base_consumer> { consumer };
     }
 
 private:
