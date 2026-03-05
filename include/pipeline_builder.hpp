@@ -15,6 +15,7 @@
 
 class component_loader  /* defined in component_loader.hpp */;
 namespace pipeline { class pipeline; }  /* defined in pipeline.hpp */;
+namespace evloop { class evloop; }  /* defined in evloop.hpp */;
 
 
 namespace pipeline {
@@ -48,7 +49,8 @@ public:
      *
      * Calling this function more than once is not safe.
      */
-    std::shared_ptr<pipeline> build(component_loader &);
+    std::shared_ptr<pipeline> build(component_loader &,
+                                    std::shared_ptr<evloop::evloop>);
 
 private:
     /* component name/type strint to integer mapping */
@@ -76,7 +78,7 @@ private:
      * Used to pass data in order of connection creations. */
     std::map<size_t, std::vector<size_t>> input_table;
 
-    /* in order degree of middleware and consumers */
+    /* In order degree of middleware and consumers. */
     std::map<size_t, size_t> in_order_degree;
 
     std::optional<component::StateCallback> state_callback;

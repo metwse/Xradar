@@ -9,16 +9,24 @@
 #include <vector>
 
 
-std::shared_ptr<pipeline::pipeline> pipeline::builder::build(component_loader &cl) {
-    auto p = pipeline::create();
+std::shared_ptr<pipeline::pipeline> pipeline::builder::build(
+    component_loader &cl,
+    std::shared_ptr<evloop::evloop> evloop
+) {
+    auto p = pipeline::create(evloop);
 
     /* TODO: Make construction multithreaded
      * "constructors may be blocking" - stated in base component's
      * documentation. Pipeline build should handle this.
      * --------------------------------------------------------------------- */
+    auto weak_p = std::weak_ptr { p };
+    auto data_callback = [weak_p](std::unique_ptr<std::any> data) {
+        if (auto p = weak_p.lock())
+            p->initiate(std::move(data));
+    };
     p->producer = cl.new_producer(get_string(producer_type_id),
                                   state_callback.value(),
-                                  [](std::unique_ptr<std::any>) {});
+                                  data_callback);
     p->producer_id = producer_id;
 
     for (auto &it : middleware)
@@ -29,9 +37,11 @@ std::shared_ptr<pipeline::pipeline> pipeline::builder::build(component_loader &c
         p->consumers[it.first] = cl.new_consumer(get_string(it.second));
     /* --------------------------------------------------------------------- */
 
+    p->name_map = std::move(string_id_map);
+
     /* See https://fahadsultan.com/csc223/datastructs/graphs_topo_kahn.html
      * Slightly modified for parallelization. */
-    std::vector<std::vector<size_t>> sorted {};
+    std::vector<std::vector<size_t>> &sorted = p->order;
     std::vector<size_t> queue { std::move(routing_table[producer_id]) };
 
     size_t total_sorted_size = 0;
@@ -60,6 +70,8 @@ std::shared_ptr<pipeline::pipeline> pipeline::builder::build(component_loader &c
 
     if (total_sorted_size != in_order_degree.size())
         throw build_error("cycle detected in pipeline");
+
+    p->input_table = std::move(input_table);
 
     return p;
 }

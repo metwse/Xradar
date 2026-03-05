@@ -21,12 +21,12 @@ int main(int, const char **argv) {
     auto middleware = cl.new_middleware("test",
                                         [](double) {});
     assert(middleware->kind() == component::kind::middleware);
-    middleware->process(std::make_shared<std::any>(0));
+    middleware->process({ std::make_shared<std::any>(0) });
     middleware->parallelizable();
 
     auto consumer = cl.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);
-    consumer->send(std::make_shared<std::any>(0));
+    consumer->send({ std::make_shared<std::any>(0) });
 
     /* destruct previous consumer and allocate new one */
     consumer = cl.new_consumer("test");

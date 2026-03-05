@@ -85,6 +85,8 @@ private:
 /** @brief Scheduled event. */
 class base_event {
 public:
+    virtual ~base_event() = default;
+
     /** @brief Operation. */
     virtual void operator()(std::shared_ptr<evloop>) = 0;
 };

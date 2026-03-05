@@ -11,7 +11,7 @@ static int event_run = 0;
 
 /** @brief Dummy event stting event_run variable true. */
 class test_event : public evloop::base_event {
-    void operator()([[maybe_unused]] std::shared_ptr<evloop::evloop> e) override {
+    void operator()(std::shared_ptr<evloop::evloop>) override {
         std::lock_guard g { event_run_m };
 
         event_run++;

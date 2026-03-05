@@ -1,3 +1,4 @@
+#include "../include/evloop.hpp"
 #include "../include/component_loader.hpp"  // IWYU pragma: keep
 #include "../include/pipeline_builder.hpp"
 #include "testutil.hpp"
@@ -6,6 +7,7 @@
 
 
 int main(int, char *argv[]) {
+    auto evloop = evloop::evloop::create();
     pipeline::builder builder;
 
     builder
@@ -49,7 +51,7 @@ int main(int, char *argv[]) {
 
     TEST_COMPONENT_LOADER;
 
-    builder.build(cl);
+    builder.build(cl, evloop);
 
     pipeline::builder builder2;
 
@@ -63,7 +65,7 @@ int main(int, char *argv[]) {
         .connect("m2", "m1");
 
     try {
-        builder2.build(cl);  /* cyclic */
+        builder2.build(cl, evloop);  /* cyclic */
     } catch (pipeline::build_error &) {
         failed++;
     }
@@ -99,5 +101,5 @@ int main(int, char *argv[]) {
         .connect("G", "J")
         .connect("J", "K");
 
-    builder3.build(cl);
+    builder3.build(cl, evloop);
 }
