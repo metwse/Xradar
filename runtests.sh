@@ -2,9 +2,9 @@
 
 export MODE=debug
 
-make -j all
+make -C tests -j
 
-for test in $(ls ./target/debug/*.test); do
+for test in $(ls ./tests/target/*.test); do
     valgrind --fair-sched=yes $test > $test.log
 done
 

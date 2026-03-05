@@ -51,19 +51,16 @@ private:
 public:
     execution(token, auto p_, auto data)
         : p { p_ }
-    {
-        result_map[p->producer_id] = std::shared_ptr { std::move(data) };
-    }
+        { result_map[p->producer_id] = std::shared_ptr { std::move(data) }; }
 
-    static std::shared_ptr<execution> create(auto p, auto data) {
-        return std::make_shared<execution>(token {}, p, std::move(data));
-    }
+    static std::shared_ptr<execution> create(auto p, auto data)
+        { return std::make_shared<execution>(token {}, p, std::move(data)); }
 
     void next_step() {
         std::lock_guard guard { m };
 
         auto &step = p->order.at(step_counter);
-        step_remaining_results = 0;
+        awaiting_middleware = 0;
 
         auto shared_this = shared_from_this();
 
@@ -73,7 +70,7 @@ public:
 
             if (p->middleware.contains(id)) {
                 component = p->middleware.at(id);
-                step_remaining_results++;
+                awaiting_middleware++;
             } else {
                 component = p->consumers.at(id);
             }
@@ -81,7 +78,7 @@ public:
             auto &input_ids = p->input_table.at(id);
             inputs.reserve(input_ids.size());
 
-            for (auto input_id :input_ids)
+            for (auto input_id : input_ids)
                 inputs.push_back(result_map.at(input_id));
 
             p->evloop->push_event(
@@ -89,9 +86,8 @@ public:
                     id,
                     component,
                     inputs,
-                    [shared_this](size_t id, std::unique_ptr<std::any> data) {
-                        shared_this->handle_response(id, std::move(data));
-                    }
+                    [shared_this](size_t id, std::unique_ptr<std::any> data)
+                        { shared_this->handle_response(id, std::move(data)); }
                 )
             );
         }
@@ -103,12 +99,12 @@ public:
         {
             std::lock_guard guard { m };
 
-            step_remaining_results--;
+            awaiting_middleware--;
 
             result_map[id] = std::move(data);
         }
 
-        if (step_remaining_results == 0)
+        if (awaiting_middleware == 0)
             next_step();
     }
 
@@ -117,7 +113,7 @@ private:
     std::shared_ptr<pipeline::pipeline> p;
 
     size_t step_counter {};
-    size_t step_remaining_results {};
+    size_t awaiting_middleware;
 
     std::map<size_t, std::shared_ptr<std::any>> result_map;
 };

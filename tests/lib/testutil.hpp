@@ -7,9 +7,7 @@
 
 #define TEST_COMPONENT_LOADER \
     std::filesystem::path lib_dir { argv[0] }; \
-    lib_dir = lib_dir.parent_path(); \
-    lib_dir /= "test-components"; \
-    component_loader cl { lib_dir };
+    component_loader cl { lib_dir.parent_path() };
 
 
 #endif

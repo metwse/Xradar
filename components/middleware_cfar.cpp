@@ -10,9 +10,6 @@ class cfar_middleware : public component::base_middleware {
     std::unique_ptr<std::any> process(std::vector<std::shared_ptr<std::any>>) override
         { throw "todo"; }
 
-    bool parallelizable() const override
-        { return true; }
-
     void configure(config::config) override {}
 };
 

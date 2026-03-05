@@ -1,7 +1,8 @@
-#include "../include/evloop.hpp"
-#include "../include/component_loader.hpp"  // IWYU pragma: keep
-#include "../include/pipeline_builder.hpp"
-#include "testutil.hpp"
+#include "../../include/evloop.hpp"
+#include "../../include/component_loader.hpp"  // IWYU pragma: keep
+#include "../../include/pipeline_builder.hpp"
+
+#include "../lib/testutil.hpp"
 
 #include <cassert>
 
@@ -99,7 +100,10 @@ int main(int, char *argv[]) {
         .connect("E", "I")
         .connect("F", "K")
         .connect("G", "J")
+        .connect("I", "H")
         .connect("J", "K");
 
     builder3.build(cl, evloop);
+
+    evloop->shutdown();
 }

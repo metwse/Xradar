@@ -1,6 +1,6 @@
-#include "../include/component_loader.hpp"
-#include "../include/components.hpp"
-#include "testutil.hpp"
+#include "../../include/component_loader.hpp"
+#include "../../include/components.hpp"
+#include "../lib/testutil.hpp"
 
 #include <cassert>
 #include <memory>
@@ -22,7 +22,6 @@ int main(int, const char **argv) {
                                         [](double) {});
     assert(middleware->kind() == component::kind::middleware);
     middleware->process({ std::make_shared<std::any>(0) });
-    middleware->parallelizable();
 
     auto consumer = cl.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);

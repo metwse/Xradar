@@ -149,15 +149,6 @@ public:
         std::vector<std::shared_ptr<std::any>>
     ) = 0;
 
-    /**
-     * @brief Wheter or not the concurrent calls to the middleware is safe.
-     *
-     * If underlying algorithm depends on previous state and shall receive
-     * inputs in order they are produced, then this function return true.
-     * Execution plan ensures that the middleware is called in correct order.
-     */
-    virtual bool parallelizable() const = 0;
-
     /** @returns component::kind::middleware */
     enum kind kind() const override
         { return kind::middleware; }

@@ -69,8 +69,3 @@ build-pipeline
 # Run the pipeline
 start-pipeline processing_pipeline1
 ```
-
-### Serializability
-Middleware can be mark as non-serializable using `parallelizable()` scheduling
-hint. When `true`, the evloop can dispatch concurrent calls to this middleware
-without ordering guarantees. When `false`, the pipeline must serialize calls
