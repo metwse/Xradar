@@ -37,7 +37,7 @@ class multiply_all : public component::base_middleware {
 };
 
 class add_all : public component::base_consumer {
-    void send(std::vector<std::any> in) override {
+    void consume(std::vector<std::any> in) override {
         int res = 0;
 
         for (auto &it : in)

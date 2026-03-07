@@ -5,7 +5,7 @@
 
 /** @cond */
 class test_consumer : public component::base_consumer {
-    void send(std::vector<std::any>) override {}
+    void consume(std::vector<std::any>) override {}
 };
 /** @endcond */
 

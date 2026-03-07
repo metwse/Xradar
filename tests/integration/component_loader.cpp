@@ -25,7 +25,7 @@ int main(int, const char **argv) {
 
     auto consumer = cl.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);
-    consumer->send({ 0 });
+    consumer->consume({ 0 });
 
     /* destruct previous consumer and allocate new one */
     consumer = cl.new_consumer("test");

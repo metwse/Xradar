@@ -165,8 +165,8 @@ private:
 /** @brief Processed signal consumer visualizer. */
 class base_consumer : public base_component  {
 public:
-    /** @brief Send data to consumer, for visualizer. */
-    virtual void send(std::vector<std::any>) = 0;
+    /** @brief Send data to a consumer, i.e. to visualizer. */
+    virtual void consume(std::vector<std::any>) = 0;
 
     /** @returns component::kind::consumer */
     enum kind kind() const override

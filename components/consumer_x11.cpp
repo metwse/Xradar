@@ -5,7 +5,7 @@
 
 /** @brief X11 graphical user interface. */
 class x11 : public component::base_consumer {
-    void send(std::vector<std::any>) override {}
+    void consume(std::vector<std::any>) override {}
 };
 
 

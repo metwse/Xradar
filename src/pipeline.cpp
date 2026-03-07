@@ -28,7 +28,7 @@ public:
             data_callback(id, middleware->process(std::move(inputs)));
         } else {
             auto consumer = dynamic_cast<component::base_consumer *>(component.get());
-            consumer->send(std::move(inputs));
+            consumer->consume(std::move(inputs));
         }
     }
 
