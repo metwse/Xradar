@@ -1,5 +1,5 @@
 #include "../include/components.hpp"
-#include "../include/evloop.hpp"
+#include "../include/evloop.hpp"  // IWYU pragma: keep, false-positive unusued alert
 #include "../include/pipeline.hpp"
 
 #include <any>
@@ -13,10 +13,10 @@
 
 class worker {
 public:
-    worker(auto id_, auto component_, auto &&inputs_, auto data_callback_)
+    worker(auto id_, auto component_, auto inputs_, auto data_callback_)
         : id { id_ },
           component { component_ },
-          inputs { inputs_ },
+          inputs(std::move(inputs_)),
           data_callback { data_callback_ }
     {}
 
@@ -37,9 +37,9 @@ private:
 
     std::shared_ptr<component::base_component> component;
 
-    std::vector<std::shared_ptr<std::any>> inputs;
+    std::vector<std::any> inputs;
 
-    std::function<void(size_t, std::unique_ptr<std::any>)> data_callback;
+    std::function<void(size_t, std::any)> data_callback;
 };
 
 class execution : public std::enable_shared_from_this<execution> {
@@ -49,7 +49,7 @@ private:
 public:
     execution(token, auto p_, auto data)
         : p { p_ }
-        { result_map[p->producer_id] = std::shared_ptr { std::move(data) }; }
+        { result_map[p->producer_id] = std::move(data); }
 
     static std::shared_ptr<execution> create(auto p, auto data)
         { return std::make_shared<execution>(token {}, p, std::move(data)); }
@@ -64,7 +64,7 @@ public:
 
         for (auto id : step) {
             std::shared_ptr<component::base_component> component;
-            std::vector<std::shared_ptr<std::any>> inputs;
+            std::vector<std::any> inputs;
 
             if (p->middleware.contains(id)) {
                 component = p->middleware.at(id);
@@ -84,7 +84,7 @@ public:
                     id,
                     component,
                     inputs,
-                    [shared_this](size_t id, std::unique_ptr<std::any> data)
+                    [shared_this](size_t id, std::any data)
                         { shared_this->handle_response(id, std::move(data)); }
                 }
             );
@@ -93,7 +93,7 @@ public:
         step_counter++;
     }
 
-    void handle_response(size_t id, std::unique_ptr<std::any> data) {
+    void handle_response(size_t id, std::any data) {
         {
             std::lock_guard guard { m };
 
@@ -113,9 +113,9 @@ private:
     size_t step_counter {};
     size_t awaiting_middleware;
 
-    std::map<size_t, std::shared_ptr<std::any>> result_map;
+    std::map<size_t, std::any> result_map;
 };
 
 
-void pipeline::pipeline::initiate(std::unique_ptr<std::any> data)
+void pipeline::pipeline::initiate(std::any data)
     { execution::create(shared_from_this(), std::move(data))->next_step(); }

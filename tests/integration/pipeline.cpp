@@ -14,34 +14,34 @@ int finished = 0;
 
 class generate_1 : public component::base_producer {
     void start() override {
-        data_callback(std::make_unique<std::any>(1));
+        data_callback(int(1));
     }
 
     void stop() override {}  // GCOVR_EXCL_LINE
 };
 
 class add_1 : public component::base_middleware {
-    std::unique_ptr<std::any> process(std::vector<std::shared_ptr<std::any>> in) override
-        { return std::make_unique<std::any>(any_cast<int>(*in[0]) + 1); }
+    std::any process(std::vector<std::any> in) override
+        { return any_cast<int>(in[0]) + 1; }
 };
 
 class multiply_all : public component::base_middleware {
-    std::unique_ptr<std::any> process(std::vector<std::shared_ptr<std::any>> in) override {
+    std::any process(std::vector<std::any> in) override {
         int res = 1;
 
         for (auto &it : in)
-            res *= std::any_cast<int>(*it);
+            res *= std::any_cast<int>(it);
 
-        return std::make_unique<std::any>(res);
+        return res;
     }
 };
 
 class add_all : public component::base_consumer {
-    void send(std::vector<std::shared_ptr<std::any>> in) override {
+    void send(std::vector<std::any> in) override {
         int res = 0;
 
         for (auto &it : in)
-            res += std::any_cast<int>(*it);
+            res += std::any_cast<int>(it);
 
         assert(res == 8);
 

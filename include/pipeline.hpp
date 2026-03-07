@@ -57,7 +57,7 @@ private:
     static std::shared_ptr<pipeline> create(std::shared_ptr<evloop::evloop> evloop)
         { return std::make_shared<pipeline>(token {}, evloop); }
 
-    void initiate(std::unique_ptr<std::any> data);
+    void initiate(std::any data);
 
     std::map<std::string, size_t> name_map;
 

@@ -20,7 +20,7 @@ std::shared_ptr<pipeline::pipeline> pipeline::builder::build(
      * documentation. Pipeline build should handle this.
      * --------------------------------------------------------------------- */
     auto weak_p = std::weak_ptr { p };
-    auto data_callback = [weak_p](std::unique_ptr<std::any> data) {
+    auto data_callback = [weak_p](std::any data) {
         if (auto p = weak_p.lock())
             p->initiate(std::move(data));
     };

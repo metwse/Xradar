@@ -12,7 +12,7 @@ int main(int, const char **argv) {
 
     auto producer = cl.new_producer("test",
                                     [](component::producer_state) {},  // GCOVR_EXCL_LINE
-                                    [](std::unique_ptr<std::any>) {});
+                                    [](std::any) {});
     assert(producer->kind() == component::kind::producer);
     producer->start();
     producer->stop();
@@ -21,11 +21,11 @@ int main(int, const char **argv) {
     auto middleware = cl.new_middleware("test",
                                         [](double) {});
     assert(middleware->kind() == component::kind::middleware);
-    middleware->process({ std::make_shared<std::any>(0) });
+    middleware->process({ 0 });
 
     auto consumer = cl.new_consumer("test");
     assert(consumer->kind() == component::kind::consumer);
-    consumer->send({ std::make_shared<std::any>(0) });
+    consumer->send({ 0 });
 
     /* destruct previous consumer and allocate new one */
     consumer = cl.new_consumer("test");

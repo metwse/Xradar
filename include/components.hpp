@@ -66,7 +66,7 @@ using StateCallback = std::function<void(producer_state)>;
 using BackpressureCallback = std::function<void(double)>;
 
 /** @brief Data stream of producers. */
-using DataCallback = std::function<void(std::unique_ptr<std::any>)>;
+using DataCallback = std::function<void(std::any)>;
 
 
 /** @brief Methods implemented by all components. */
@@ -145,9 +145,7 @@ public:
      *
      * This can be blocking as the event loop handles parallelization.
      */
-    virtual std::unique_ptr<std::any> process(
-        std::vector<std::shared_ptr<std::any>>
-    ) = 0;
+    virtual std::any process(std::vector<std::any>) = 0;
 
     /** @returns component::kind::middleware */
     enum kind kind() const override
@@ -169,7 +167,7 @@ private:
 class base_consumer : public base_component  {
 public:
     /** @brief Send data to consumer, for visualizer. */
-    virtual void send(std::vector<std::shared_ptr<std::any>>) = 0;
+    virtual void send(std::vector<std::any>) = 0;
 
     /** @returns component::kind::consumer */
     enum kind kind() const override
