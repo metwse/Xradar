@@ -6,6 +6,11 @@ MODE ?= release
 
 # Build directory
 DIST_DIR = $(WORKDIR)target
+TARGET_DIR = $(DIST_DIR)/$(MODE)
+
+# The main executable
+TARGET = $(TARGET_DIR)/$(NAME)
+TARGET_LIB = $(TARGET_DIR)/lib$(NAME).a
 
 CXX = c++
 RM = rm -rf
