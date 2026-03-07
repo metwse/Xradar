@@ -11,7 +11,7 @@
 #include <vector>
 
 
-class worker : public evloop::base_event {
+class worker {
 public:
     worker(auto id_, auto component_, auto &&inputs_, auto data_callback_)
         : id { id_ },
@@ -20,9 +20,7 @@ public:
           data_callback { data_callback_ }
     {}
 
-    ~worker() override = default;
-
-    void operator()(std::shared_ptr<evloop::evloop>) override {
+    void operator()() {
         /* TODO: use component::kind instead */
         if (auto middleware = dynamic_cast<component::base_middleware *>(component.get());
             middleware != NULL) {
@@ -82,13 +80,13 @@ public:
                 inputs.push_back(result_map.at(input_id));
 
             p->evloop->push_event(
-                std::make_unique<worker>(
+                worker {
                     id,
                     component,
                     inputs,
                     [shared_this](size_t id, std::unique_ptr<std::any> data)
                         { shared_this->handle_response(id, std::move(data)); }
-                )
+                }
             );
         }
 

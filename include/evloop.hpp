@@ -3,13 +3,14 @@
  * @brief Event loop.
  */
 
-#ifndef EVLOOOP_HPP
-#define EVLOOOP_HPP
+#ifndef EVLOOP_HPP
+#define EVLOOP_HPP
 
 
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -19,8 +20,6 @@ class state;  /* internal: defined in state.hpp */
 
 
 namespace evloop {
-
-class base_event;
 
 /** @brief Event loop frontend. */
 class evloop : public std::enable_shared_from_this<evloop> {
@@ -77,18 +76,9 @@ private:
 
     std::condition_variable event_queue_cv;
     std::mutex event_queue_m;
-    std::deque<std::unique_ptr<base_event>> event_queue;
+    std::deque<std::function<void()>> event_queue;
 
     std::vector<std::thread> threads;
-};
-
-/** @brief Scheduled event. */
-class base_event {
-public:
-    virtual ~base_event() = default;
-
-    /** @brief Operation. */
-    virtual void operator()(std::shared_ptr<evloop>) = 0;
 };
 
 }

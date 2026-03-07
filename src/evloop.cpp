@@ -2,6 +2,7 @@
 
 #include <clocale>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -57,7 +58,7 @@ void evloop::evloop::run(std::shared_ptr<evloop> e,
     e->thread_ready_cv.notify_one();
 
     while (e->running) {
-        std::deque<std::unique_ptr<base_event>> items_to_process;
+        std::deque<std::function<void()>> items_to_process;
 
         {
             std::unique_lock lk { e->event_queue_m };
@@ -69,6 +70,6 @@ void evloop::evloop::run(std::shared_ptr<evloop> e,
         }
 
         for (auto &event : items_to_process)
-            (*event)(e);
+            event();
     }
 }
