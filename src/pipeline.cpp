@@ -1,6 +1,6 @@
 #include "../include/components.hpp"
-#include "../include/evloop.hpp"  // IWYU pragma: keep, false-positive unusued alert
 #include "../include/pipeline.hpp"
+#include "../include/tpool.hpp"  // IWYU pragma: keep, false-positive unusued alert
 
 #include <any>
 #include <cstddef>
@@ -79,7 +79,7 @@ public:
             for (auto input_id : input_ids)
                 inputs.push_back(result_map.at(input_id));
 
-            p->evloop->push_event(
+            p->tpool->push_task(
                 worker {
                     id,
                     component,

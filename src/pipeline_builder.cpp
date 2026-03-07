@@ -1,6 +1,7 @@
 #include "../include/component_loader.hpp"
 #include "../include/pipeline.hpp"
 #include "../include/pipeline_builder.hpp"
+#include "../include/tpool.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -11,9 +12,9 @@
 
 std::shared_ptr<pipeline::pipeline> pipeline::builder::build(
     component_loader &cl,
-    std::shared_ptr<evloop::evloop> evloop
+    std::shared_ptr<tpool::tpool> tpool
 ) {
-    auto p = pipeline::create(evloop);
+    auto p = pipeline::create(tpool);
 
     /* TODO: Make construction multithreaded
      * "constructors may be blocking" - stated in base component's

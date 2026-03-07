@@ -12,7 +12,6 @@
 #include <any>
 #include <cstddef>
 #include <functional>
-#include <memory>
 #include <string>
 
 class component_loader  /* defined in component_loader.hpp */;
@@ -143,7 +142,7 @@ public:
     /**
      * @brief Feed the middleware with input and receive output.
      *
-     * This can be blocking as the event loop handles parallelization.
+     * This can be blocking as the thread pool handles parallelization.
      */
     virtual std::any process(std::vector<std::any>) = 0;
 

@@ -1,7 +1,7 @@
 #include "../../include/components.hpp"
-#include "../../include/evloop.hpp"
 #include "../../include/pipeline_builder.hpp"
 #include "../../include/pipeline.hpp"
+#include "../../include/tpool.hpp"
 
 #include "../lib/mock_component_loader.hpp"
 
@@ -51,7 +51,7 @@ class add_all : public component::base_consumer {
 
 
 int main() {
-    auto evloop = evloop::evloop::create();
+    auto tpool = tpool::tpool::create();
 
     mock_component_loader cl;
     pipeline::builder builder;
@@ -100,12 +100,12 @@ int main() {
         .connect("I", "H")
         .connect("J", "K");
 
-    auto pipeline = builder.build(cl, evloop);
+    auto pipeline = builder.build(cl, tpool);
 
     pipeline->start();
 
     while (finished != 2)
         ;
 
-    evloop->shutdown();
+    tpool->shutdown();
 }

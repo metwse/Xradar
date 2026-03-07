@@ -1,4 +1,4 @@
-#include "../../include/evloop.hpp"
+#include "../../include/tpool.hpp"
 #include "../../include/component_loader.hpp"  // IWYU pragma: keep
 #include "../../include/pipeline_builder.hpp"
 
@@ -6,7 +6,7 @@
 
 
 int main(int, char *argv[]) {
-    auto evloop = evloop::evloop::create();
+    auto tpool = tpool::tpool::create();
     pipeline::builder builder;
 
     builder
@@ -51,7 +51,7 @@ int main(int, char *argv[]) {
     std::filesystem::path lib_dir { argv[0] };
     component_loader cl { lib_dir.parent_path() };
 
-    builder.build(cl, evloop);
+    builder.build(cl, tpool);
 
     pipeline::builder builder2;
 
@@ -65,12 +65,12 @@ int main(int, char *argv[]) {
         .connect("m2", "m1");
 
     try {
-        builder2.build(cl, evloop);  /* cyclic */
+        builder2.build(cl, tpool);  /* cyclic */
     } catch (pipeline::build_error &) {
         failed++;
     }
 
     assert(failed == 4);
 
-    evloop->shutdown();
+    tpool->shutdown();
 }

@@ -3,15 +3,12 @@ Xradar is a C++20 radar signal processing framework built around a
 plugin-based, event-driven pipeline.
 
 ## Architecture
-The design separates concerns into four layers: pipeline configuration, event
-dispatch, signal processing, and on-fly reconfiguration.
-
-Xradar employs a custom event loop, optimized for parallel computing. The
-event loop synchronizes processing pipeline, providing parallel computing for
+Xradar employs a custom thread pool, optimized for parallel computing. The
+`execution` synchronizes processing pipeline, providing parallel computing for
 processing branches.
 
 The system is component based, and it can be extended using dynamic libraries
-*at runtime*. The core event loop handles 3 kinds of components:
+*at runtime*. The pipeline handles 3 kinds of components:
 
 1. Producer: The root signal source. Initiates a processing pipeline. This
    pipeline may branch out depending on configuration.
@@ -28,7 +25,7 @@ these messages is entirely implementation-defined
 ### Pipeline
 The processing pipeline is initiated by the `data_callback` of a producer
 (input source). Signals are propagated and processed through the pipeline,
-where the event loop automatically parallelizes operations whenever possible
+which is automatically parallelized whenever possible
 
 ```txt
 source ----> middleware1 ----> middleware2 ----> visualizer

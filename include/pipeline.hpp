@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace evloop { class evloop; }  /* defined in evloop.hpp */
+namespace tpool { class tpool; }  /* defined in tpool.hpp */
 namespace pipeline { class builder; }  /* defined in pipeline.hpp */
 class execution;  /* internal: defined in pipeline.cpp */
 
@@ -25,8 +25,8 @@ private:
     struct token { explicit token() = default; };
 
 public:
-    pipeline(token, std::shared_ptr<evloop::evloop> evloop_)
-        : evloop { evloop_ } {}
+    pipeline(token, std::shared_ptr<tpool::tpool> tpool_)
+        : tpool { tpool_ } {}
 
     /** @brief Start the processing pipeline. */
     void start()
@@ -54,8 +54,8 @@ private:
     friend class builder;
     friend class ::execution;
 
-    static std::shared_ptr<pipeline> create(std::shared_ptr<evloop::evloop> evloop)
-        { return std::make_shared<pipeline>(token {}, evloop); }
+    static std::shared_ptr<pipeline> create(std::shared_ptr<tpool::tpool> tpool)
+        { return std::make_shared<pipeline>(token {}, tpool); }
 
     void initiate(std::any data);
 
@@ -71,7 +71,7 @@ private:
 
     std::map<size_t, std::vector<size_t>> input_table;
 
-    std::shared_ptr<evloop::evloop> evloop;
+    std::shared_ptr<tpool::tpool> tpool;
 };
 
 }

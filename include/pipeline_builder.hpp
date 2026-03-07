@@ -15,7 +15,7 @@
 
 class component_loader  /* defined in component_loader.hpp */;
 namespace pipeline { class pipeline; }  /* defined in pipeline.hpp */;
-namespace evloop { class evloop; }  /* defined in evloop.hpp */;
+namespace tpool { class tpool; }  /* defined in tpool.hpp */;
 
 
 namespace pipeline {
@@ -50,7 +50,7 @@ public:
      * Calling this function more than once is not safe.
      */
     std::shared_ptr<pipeline> build(component_loader &,
-                                    std::shared_ptr<evloop::evloop>);
+                                    std::shared_ptr<tpool::tpool>);
 
 private:
     /* component name/type strint to integer mapping */
