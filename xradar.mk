@@ -31,17 +31,19 @@ xradar_EXTERNAL_LIB_SO = $(foreach lib, \
 			   $(xradar_EXTERNAL_LIBS), \
 			   $(xradar_EXTERNAL_DIR)/lib/lib$(lib).so)
 
-$(TARGET): $(xradar_OBJS) $(xradar_EXTERNAL_LIB_AR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+xradar_EXTERNAL_INCLUDE = $(xradar_EXTERNAL_DIR)/include
 
-$(TARGET_LIB): $(xradar_LIB_OBJS) $(xradar_EXTERNAL_LIB_SO)
-	ar rcs $@ $^
+$(TARGET): $(xradar_OBJS) | $(xradar_EXTERNAL_INCLUDE)
+	$(CXX) $(CXXFLAGS) $^ $(xradar_EXTERNAL_LIB_AR) -o $@
+
+$(TARGET_LIB): $(xradar_LIB_OBJS) | $(xradar_EXTERNAL_INCLUDE)
+	ar rcs $@ $(xradar_EXTERNAL_LIB_SO) $^
 
 $(xradar_OBJ_DIR)/%.o: $(xradar_SRC_DIR)/%.cpp | $(xradar_OBJ_DIR) \
-		$(xradar_EXTERNAL_LIB_SO)
+		$(xradar_EXTERNAL_INCLUDE)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(xradar_EXTERNAL_LIB_AR) $(xradar_EXTERNAL_LIB_SO):
+$(xradar_EXTERNAL_INCLUDE):
 	cd $(xradar_EXTERNAL_DIR); $(MAKE) -j
 
 $(xradar_OBJ_DIR) $(TARGET_DIR):
