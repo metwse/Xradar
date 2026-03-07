@@ -15,6 +15,7 @@
 #include <map>
 #include <memory>
 #include <stdexcept>  // IWYU pragma: keep (enable doxygen to extract documentation)
+#include <string_view>
 #include <utility>
 
 
@@ -30,7 +31,7 @@ public:
 
     /** @brief Create a new producer component. */
     std::unique_ptr<component::base_producer> new_producer(
-        std::string type,
+        std::string_view type,
         component::StateCallback state_callback,
         component::DataCallback data_callback
     ) {
@@ -45,7 +46,7 @@ public:
 
     /** @brief Create a new middleware component. */
     std::unique_ptr<component::base_middleware> new_middleware(
-        std::string type,
+        std::string_view type,
         component::BackpressureCallback backpressure_callback
     ) {
         auto middleware = dynamic_cast<component::base_middleware *>(
@@ -58,7 +59,7 @@ public:
     }
 
     /** @brief Create a new consumer component. */
-    std::unique_ptr<component::base_consumer> new_consumer(std::string type) {
+    std::unique_ptr<component::base_consumer> new_consumer(std::string_view type) {
         auto consumer = dynamic_cast<component::base_consumer *>(
             new_base(component::kind::consumer, type)
         );
@@ -66,19 +67,34 @@ public:
         return std::unique_ptr<component::base_consumer> { consumer };
     }
 
+protected:
+    /** @brief Dynamically loaded constructor function. */
+    using ComponentConstructor = component::base_component *(*)();
+
+    /** @brief Unique identifier of (component kind, component type) pair. */
+    size_t type_id(component::kind kind, std::string_view type) {
+        auto &id = type_map[std::make_pair(kind, std::string { type })];
+
+        if (id == 0)
+            id = ++last_type_id;
+
+        return id;
+    }
+
+    /** @brief TESTING: User may inject its own constructors via constructors
+     * field. */
+    std::map<size_t, ComponentConstructor> constructors;
+
 private:
     /* RAII wrapper for dynamic component libraries. */
     using DlHandle = std::unique_ptr<void, std::function<int(void *)>>;
-
-    /** @brief Dynamically loaded constructor function. */
-    using ComponentConstructor = component::base_component *(*)();
 
     /**
      * @brief Concstucts component based on its class and type.
      *
      * @throw std::runtime_error dynamic loading is failed.
      */
-    component::base_component *new_base(component::kind, std::string &type);
+    component::base_component *new_base(component::kind, std::string_view type);
 
     std::filesystem::path lib_dir { "" };
 
@@ -87,7 +103,6 @@ private:
              size_t> type_map;
 
     std::map<size_t, DlHandle> libs;
-    std::map<size_t, ComponentConstructor> constructors;
 };
 
 

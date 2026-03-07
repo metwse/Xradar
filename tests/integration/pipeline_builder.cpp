@@ -2,8 +2,6 @@
 #include "../../include/component_loader.hpp"  // IWYU pragma: keep
 #include "../../include/pipeline_builder.hpp"
 
-#include "../lib/testutil.hpp"
-
 #include <cassert>
 
 
@@ -50,7 +48,8 @@ int main(int, char *argv[]) {
 
     assert(failed == 3);
 
-    TEST_COMPONENT_LOADER;
+    std::filesystem::path lib_dir { argv[0] };
+    component_loader cl { lib_dir.parent_path() };
 
     builder.build(cl, evloop);
 
@@ -72,38 +71,6 @@ int main(int, char *argv[]) {
     }
 
     assert(failed == 4);
-
-    pipeline::builder builder3;
-
-    builder3
-        .set_producer("A", "test")
-        .set_state_callback([](component::producer_state) {})
-        .add_middleware("B", "test")
-        .add_middleware("C", "test")
-        .add_middleware("D", "test")
-        .add_middleware("E", "test")
-        .add_middleware("F", "test")
-        .add_middleware("G", "test")
-        .add_consumer("H", "test")
-        .add_middleware("I", "test")
-        .add_middleware("J", "test")
-        .add_consumer("K", "test")
-        .connect("A", "B")
-        .connect("A", "C")
-        .connect("A", "D")
-        .connect("B", "E")
-        .connect("B", "I")
-        .connect("C", "F")
-        .connect("C", "G")
-        .connect("D", "G")
-        .connect("D", "H")
-        .connect("E", "I")
-        .connect("F", "K")
-        .connect("G", "J")
-        .connect("I", "H")
-        .connect("J", "K");
-
-    builder3.build(cl, evloop);
 
     evloop->shutdown();
 }

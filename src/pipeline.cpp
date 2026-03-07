@@ -44,7 +44,7 @@ private:
     std::function<void(size_t, std::unique_ptr<std::any>)> data_callback;
 };
 
-class execution : std::enable_shared_from_this<execution> {
+class execution : public std::enable_shared_from_this<execution> {
 private:
     struct token { explicit token() = default; };
 

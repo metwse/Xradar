@@ -5,16 +5,13 @@
 #include <functional>
 #include <memory>
 #include <stdexcept>
-#include <utility>
 
 #include <dlfcn.h>
 
 
 component::base_component *component_loader::new_base(component::kind kind,
-                                                       std::string &type) {
-    auto &id = type_map[std::make_pair(kind, type)];
-    if (id == 0)
-        id = ++last_type_id;
+                                                      std::string_view type) {
+    auto id = type_id(kind, type);
 
     if (!constructors.contains(id)) {
         std::filesystem::path file(lib_dir);

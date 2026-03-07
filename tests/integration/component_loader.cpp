@@ -1,6 +1,5 @@
 #include "../../include/component_loader.hpp"
 #include "../../include/components.hpp"
-#include "../lib/testutil.hpp"
 
 #include <cassert>
 #include <memory>
@@ -8,7 +7,8 @@
 
 
 int main(int, const char **argv) {
-    TEST_COMPONENT_LOADER;
+    std::filesystem::path lib_dir { argv[0] };
+    component_loader cl { lib_dir.parent_path() };
 
     auto producer = cl.new_producer("test",
                                     [](component::producer_state) {},  // GCOVR_EXCL_LINE

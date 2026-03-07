@@ -7,6 +7,8 @@
 #define COMPONENTS_HPP
 
 
+#include "config.hpp"
+
 #include <any>
 #include <cstddef>
 #include <functional>
@@ -14,8 +16,6 @@
 #include <string>
 
 class component_loader  /* defined in component_loader.hpp */;
-
-namespace config { class config; }  /* defined in config.hpp */;
 
 
 namespace component {
@@ -82,7 +82,7 @@ public:
      *
      * @throws component::error if configuration failed.
      */
-    virtual void configure(config::config) = 0;
+    virtual void configure(config::config) {};  // GCOVR_EXCL_LINE
 
     /** @brief Component type. */
     virtual enum kind kind() const = 0;

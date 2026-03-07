@@ -23,7 +23,7 @@ namespace evloop {
 class base_event;
 
 /** @brief Event loop frontend. */
-class evloop : std::enable_shared_from_this<evloop> {
+class evloop : public std::enable_shared_from_this<evloop> {
 private:
     struct token { explicit token() = default; };
 

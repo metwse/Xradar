@@ -1,5 +1,4 @@
 #include "../../include/components.hpp"
-#include "../../include/config.hpp"
 
 #include <any>
 #include <memory>
@@ -9,9 +8,7 @@
 /** @cond */
 class test_middleware : public component::base_middleware {
     std::unique_ptr<std::any> process(std::vector<std::shared_ptr<std::any>>) override
-        { return std::make_unique<std::any>(1); }
-
-    void configure(config::config) override {}  // GCOVR_EXCL_LINE
+        { return std::make_unique<std::any>(); }
 };
 /** @endcond */
 
