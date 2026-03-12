@@ -2,9 +2,9 @@
 #include "config_grammar.hpp"
 #include "config_lex.hpp"
 
-#include "../external/include/rdesc/cst_macros.h"
-#include "../external/include/rdesc/rdesc.h"
-#include "../external/include/rdesc/util.h"
+#include "../rdesc/include/cst_macros.h"
+#include "../rdesc/include/rdesc.h"
+#include "../rdesc/include/util.h"
 
 #include <cctype>
 #include <cstring>

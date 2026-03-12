@@ -5,7 +5,8 @@ NAME = Xradar
 MODE ?= release
 
 # Build directory
-DIST_DIR = $(WORKDIR)target
+WORKDIR ?= .
+DIST_DIR = $(WORKDIR)/target
 TARGET_DIR = $(DIST_DIR)/$(MODE)
 
 # The main executable

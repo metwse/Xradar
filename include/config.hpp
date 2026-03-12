@@ -7,7 +7,7 @@
 #define CONFIG_HPP
 
 
-#include "../external/include/rdesc/rdesc.h"
+#include "../rdesc/include/rdesc.h"
 
 #include <cstddef>
 #include <exception>

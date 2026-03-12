@@ -1,5 +1,5 @@
-export MODE=debug
-export WORKDIR=../
+MODE = debug
+WORKDIR = ..
 
 include ../config.mk
 
@@ -32,22 +32,25 @@ default: $(INTEGRATION_TARGETS) $(COMPONENT_TARGETS)
 
 include ../xradar.mk
 
+
 # Test build rules compile from project root for gcovr compatibility.
 # - INTEGRATION ---------------------------------------------------------------
 .SECONDARY:
-$(OBJ_DIR)/%.test.o: $(INTEGRATION_DIR)/%.cpp | $(OBJ_DIR) $(TARGET_LIB)
+$(OBJ_DIR)/%.test.o: $(INTEGRATION_DIR)/%.cpp | $(OBJ_DIR)
 	cd ..; $(CXX) $(CXXFLAGS) -c tests/$< -o tests/$@
 	$(CXX) -MM $< -MF $(@:.o=.d) -MT $@
-$(TEST_TARGET_DIR)/%.test: $(OBJ_DIR)/%.test.o $(TARGET_LIB) \
+
+$(TEST_TARGET_DIR)/%.test: $(OBJ_DIR)/%.test.o $(TARGET_LIB) $(RDESC) \
 		| $(TEST_TARGET_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 # - COMPONENTS ----------------------------------------------------------------
 .SECONDARY:
-$(OBJ_DIR)/%.component.o: $(COMPONENT_DIR)/%.cpp | $(OBJ_DIR) $(TARGET_LIB)
+$(OBJ_DIR)/%.component.o: $(COMPONENT_DIR)/%.cpp | $(OBJ_DIR)
 	cd ..; $(CXX) $(CXXFLAGS) -c tests/$< -o tests/$@
 	$(CXX) -MM $< -MF $(@:.o=.d) -MT $@
-$(TEST_TARGET_DIR)/%.so: $(OBJ_DIR)/%.component.o $(TARGET_LIB) \
+
+$(TEST_TARGET_DIR)/%.so: $(OBJ_DIR)/%.component.o $(TARGET_LIB) $(RDESC) \
 		| $(TEST_TARGET_DIR)
 	$(CXX) -shared $(CXXFLAGS) $^ -o $@
 

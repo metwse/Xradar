@@ -1,12 +1,12 @@
 #include "config_grammar.hpp"
 
-#include "../external/include/rdesc/grammar.h"
-#include "../external/include/rdesc/util.h"
+#include "../rdesc/include/grammar.h"
+#include "../rdesc/include/util.h"
 
 #define PREFIX_TK(tk) TK_ ## tk
 #define PREFIX_NT(nt) NT_ ## nt
 
-#include "../external/include/rdesc/bnf_macros.h"
+#include "../rdesc/include/bnf_macros.h"
 
 #include <cstdio>
 #include <functional>

@@ -4,14 +4,12 @@
 #     TARGET_LIB: Static library containing all Xradar symbols except for the
 #                 main function
 
-xradar_EXTERNAL_LIBS = rdesc
-
 # Directory configuration.
-xradar_SRC_DIR = $(WORKDIR)src
-
-xradar_EXTERNAL_DIR = $(WORKDIR)external
+xradar_SRC_DIR = $(WORKDIR)/src
 
 xradar_OBJ_DIR = $(TARGET_DIR)/obj
+
+xradar_RDESC_DIR = $(WORKDIR)/rdesc
 
 # Source and object files.
 xradar_SRCS = $(wildcard $(xradar_SRC_DIR)/*.cpp)
@@ -23,28 +21,26 @@ xradar_OBJS = $(patsubst $(xradar_SRC_DIR)/%.cpp, \
 # Object files excluding the one containing main function.
 xradar_LIB_OBJS = $(filter-out $(xradar_OBJ_DIR)/main.o, $(xradar_OBJS))
 
-xradar_EXTERNAL_LIB_AR = $(foreach lib, \
-			   $(xradar_EXTERNAL_LIBS), \
-			   $(xradar_EXTERNAL_DIR)/lib/lib$(lib).a)
 
-xradar_EXTERNAL_LIB_SO = $(foreach lib, \
-			   $(xradar_EXTERNAL_LIBS), \
-			   $(xradar_EXTERNAL_DIR)/lib/lib$(lib).so)
+RDESC_MODE := $(MODE)
+RDESC_DIR := $(xradar_RDESC_DIR)
+RDESC_FEATURES := full
 
-xradar_EXTERNAL_INCLUDE = $(xradar_EXTERNAL_DIR)/include
+$(xradar_RDESC_DIR)/rdesc.mk:
+	git clone https://github.com/metwse/rdesc.git $(xradar_RDESC_DIR) \
+		--branch v0.2.x
 
-$(TARGET): $(xradar_OBJS) | $(xradar_EXTERNAL_INCLUDE)
-	$(CXX) $(CXXFLAGS) $^ $(xradar_EXTERNAL_LIB_AR) -o $@
+include $(xradar_RDESC_DIR)/rdesc.mk
 
-$(TARGET_LIB): $(xradar_LIB_OBJS) | $(xradar_EXTERNAL_INCLUDE)
-	ar rcs $@ $(xradar_EXTERNAL_LIB_SO) $^
 
-$(xradar_OBJ_DIR)/%.o: $(xradar_SRC_DIR)/%.cpp | $(xradar_OBJ_DIR) \
-		$(xradar_EXTERNAL_INCLUDE)
+$(TARGET): $(xradar_OBJS) $(RDESC)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+$(TARGET_LIB): $(xradar_LIB_OBJS)
+	$(AR) rcs $@ $^
+
+$(xradar_OBJ_DIR)/%.o: $(xradar_SRC_DIR)/%.cpp | $(xradar_OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(xradar_EXTERNAL_INCLUDE):
-	cd $(xradar_EXTERNAL_DIR); $(MAKE) -j
 
 $(xradar_OBJ_DIR) $(TARGET_DIR):
 	$(MKDIR) $@
