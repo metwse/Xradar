@@ -1,21 +1,17 @@
-include config.mk
+RM := rm -rf
+
+ifneq ($(MODE),)
+RDESC_MODE := $(MODE)
+endif
+
+CXXFLAGS_COMPONENT = -shared
 
 
 # Component directory configuration.
 COMPONENT_SRC_DIR = components
 
-COMPONENT_TARGET_DIR = $(DIST_DIR)/$(MODE)/components
-COMPONENT_OBJ_DIR = $(DIST_DIR)/$(MODE)/obj/components
-
-# Set CXXFLAGS based on MODE variable.
-CXXFLAGS_release = $(CXXFLAGS_COMMON) -O2
-CXXFLAGS_debug = $(CXXFLAGS_COMMON) -O0 -g3 --coverage
-
-CXXFLAGS = $(CXXFLAGS_$(MODE))
-
-ifeq ($(CXXFLAGS),)
-$(error "WARNING: unknown mode $(MODE).")
-endif
+COMPONENT_TARGET_DIR = $(xradar_TARGET_DIR)/components
+COMPONENT_OBJ_DIR = $(xradar_TARGET_DIR)/obj/components
 
 # Component source and object files.
 COMPONENT_SRCS = $(wildcard $(COMPONENT_SRC_DIR)/*.cpp)
@@ -30,29 +26,31 @@ COMPONENT_TARGETS = $(patsubst $(COMPONENT_SRC_DIR)/%.cpp, \
 		      $(COMPONENT_SRCS))
 
 
-default: $(TARGET) $(TARGET_LIB) $(COMPONENT_TARGETS)
+default: _default
 
 include xradar.mk
 
+_default: $(XRADAR) $(XRADAR_LIB) $(COMPONENT_TARGETS)
+
 
 $(COMPONENT_TARGET_DIR)/%.so: $(COMPONENT_OBJ_DIR)/%.o | $(COMPONENT_TARGET_DIR)
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_COMPONENT) $^ -o $@
+	$(CXX) $(xradar_CXXFLAGS_COMMON) $(CXXFLAGS_COMPONENT) $^ -o $@
 
 .SECONDARY:
 $(COMPONENT_OBJ_DIR)/%.o: $(COMPONENT_SRC_DIR)/%.cpp | $(COMPONENT_OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(xradar_CXXFLAGS_COMMON) -c $< -o $@
 
 $(COMPONENT_TARGET_DIR) $(COMPONENT_OBJ_DIR):
-	$(MKDIR) $@
+	$(xradar_MKDIR) $@
 
 
 clean:
-	$(RM) $(DIST_DIR) docs
+	$(RM) $(xradar_DIST_DIR) docs
 
 docs:
 	doxygen
 
-.PHONY: default clean docs
+.PHONY: default _default clean docs
 
 
 -include $(COMPONENT_OBJS:.o=.d)
