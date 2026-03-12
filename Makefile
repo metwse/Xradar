@@ -1,7 +1,7 @@
 RM := rm -rf
 
 ifneq ($(MODE),)
-RDESC_MODE := $(MODE)
+XRADAR_MODE := $(MODE)
 endif
 
 CXXFLAGS_COMPONENT = -shared
