@@ -2,16 +2,13 @@
 
 #include "../rdesc/include/grammar.h"
 #include "../rdesc/include/util.h"
-
-#define PREFIX_TK(tk) TK_ ## tk
-#define PREFIX_NT(nt) NT_ ## nt
-
-#include "../rdesc/include/bnf_macros.h"
+#include "../rdesc/include/rule_macros.h"
 
 #include <cstdio>
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <new>
 
 
 #define TK_COUNT 10
@@ -26,22 +23,22 @@ using namespace config;
 static const rdesc_grammar_symbol
 production_rules[NT_COUNT][NT_VARIANT_COUNT][NT_BODY_LENGTH] = {
     /* <directive> ::= */ r(
-        TK(IDENT), NT(OPTPARAMETER_LS), TK(SEMI),
-    alt TK(SEMI),
+        TK(IDENT), NT(OPTPARAMETER_LS), TK(SEMI)
+    alt TK(SEMI)
     ),
 
     /* <directives> ::= */ ropt(NT(DIRECTIVE), NT(DIRECTIVES)),
 
     /* <parameter> ::= */ r(
-        TK(INT),
-    alt TK(FLOAT),
-    alt TK(STR),
-    alt TK(BOOL),
-    alt TK(LBRACE), NT(DIRECTIVES), TK(RBRACE),
+        TK(INT)
+    alt TK(FLOAT)
+    alt TK(STR)
+    alt TK(BOOL)
+    alt TK(LBRACE), NT(DIRECTIVES), TK(RBRACE)
     ),
 
     /* <parameter_ls> ::= */ r(
-        NT(PARAMETER), NT(PARAMETER_LS_REST),
+        NT(PARAMETER), NT(PARAMETER_LS_REST)
     ),
 
     /* <parameter_ls_rest> ::= */ ropt(NT(PARAMETER_LS)),
@@ -77,9 +74,10 @@ rdesc_grammar *config::get_grammar() {
     std::lock_guard guard { m_global_grammar };
 
     if (!global_grammar_initialized) {
-        rdesc_grammar_init(&global_grammar_,
+        if (rdesc_grammar_init(&global_grammar_,
                            NT_COUNT, NT_VARIANT_COUNT, NT_BODY_LENGTH,
-                           (const struct rdesc_grammar_symbol *) production_rules);
+                           (const struct rdesc_grammar_symbol *) production_rules))
+            throw std::bad_alloc();  // GCOVR_EXCL_LINE
 
         global_grammar_initialized = true;
     }

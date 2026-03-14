@@ -61,7 +61,8 @@ config::builder::builder() {
                    seminfo_deleter))
         throw std::bad_alloc();  // GCOVR_EXCL_LINE
 
-    rdesc_start(&p, NT_DIRECTIVE);
+    if (rdesc_start(&p, NT_DIRECTIVE))
+        throw std::bad_alloc();  // GCOVR_EXCL_LINE
 }
 
 void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
@@ -142,16 +143,16 @@ void config::builder::operator<<(std::istream &is) {
         case RDESC_READY:
             consume_tree(config, rdesc_root(&p));
 
-            if (rdesc_reset(&p))
+            rdesc_reset(&p);
+            if (rdesc_start(&p, NT_DIRECTIVE))
                     throw std::bad_alloc();  // GCOVR_EXCL_LINE
-            rdesc_start(&p, NT_DIRECTIVE);
             break;
 
         case RDESC_NOMATCH:
-            if (rdesc_reset(&p))
+            rdesc_reset(&p);
+            if (rdesc_start(&p, NT_DIRECTIVE))
                     throw std::bad_alloc();  // GCOVR_EXCL_LINE
 
-            rdesc_start(&p, NT_DIRECTIVE);
             throw syntax_error("cannot parse input");
 
         case RDESC_CONTINUE:
