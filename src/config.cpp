@@ -66,7 +66,7 @@ config::builder::builder() {
 }
 
 void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
-    if (rvariant(n) == 1)
+    if (ralt_id(n) == 1)
         return;
 
 
@@ -78,18 +78,18 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
 
     auto optparameter_ls = rchild(&p, n, 1);
 
-    if (rvariant(optparameter_ls) == 0  /* parameter_ls*/) {
+    if (ralt_id(optparameter_ls) == 0  /* parameter_ls*/) {
         auto parameter_ls = rchild(&p, optparameter_ls, 0);
 
         while (true) {
             auto parameter = rchild(&p, parameter_ls, 0);
 
-            if (rvariant(parameter) == 4  /* block */) {
+            if (ralt_id(parameter) == 4  /* block */) {
                 auto block = std::make_shared<class config>();
 
                 auto directives = rchild(&p, parameter, 1);
 
-                while (rvariant(directives) == 0) {
+                while (ralt_id(directives) == 0) {
                     auto directive = rchild(&p, directives, 0);
 
                     consume_tree(*block, directive);
@@ -103,7 +103,7 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
 
                 ConfigValue item;
 
-                switch (rvariant(parameter)) {
+                switch (ralt_id(parameter)) {
                 case 0:  /* int */
                     item = *static_cast<size_t *>(any_seminfo);
                     break;
@@ -123,7 +123,7 @@ void config::builder::consume_tree(class config &c, struct rdesc_node *n) {
 
             auto parameter_ls_rest = rchild(&p, parameter_ls, 1);
 
-            if (rvariant(parameter_ls_rest) == 1  /* E */)
+            if (ralt_id(parameter_ls_rest) == 1  /* E */)
                 break;
 
             parameter_ls = rchild(&p, parameter_ls_rest, 0);

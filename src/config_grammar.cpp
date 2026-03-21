@@ -14,14 +14,14 @@
 #define TK_COUNT 10
 
 #define NT_COUNT 6
-#define NT_VARIANT_COUNT 6
-#define NT_BODY_LENGTH 4
+#define NT_VARIANT_COUNT 5
+#define NT_BODY_LENGTH 3
 
 
 using namespace config;
 
 static const rdesc_grammar_symbol
-production_rules[NT_COUNT][NT_VARIANT_COUNT][NT_BODY_LENGTH] = {
+production_rules[NT_COUNT][NT_VARIANT_COUNT + 1][NT_BODY_LENGTH + 1] = {
     /* <directive> ::= */ r(
         TK(IDENT), NT(OPTPARAMETER_LS), TK(SEMI)
     alt TK(SEMI)

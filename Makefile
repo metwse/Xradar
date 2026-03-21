@@ -47,6 +47,9 @@ $(COMPONENT_TARGET_DIR) $(COMPONENT_OBJ_DIR):
 clean:
 	$(RM) $(xradar_DIST_DIR) docs
 
+clean-vendor:
+	$(RM) vendor rdesc
+
 docs:
 	doxygen
 
